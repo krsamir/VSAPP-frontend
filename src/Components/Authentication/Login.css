@@ -117,7 +117,7 @@
   background: transparent;
   border: 2px solid rgba(255, 255, 255, 0.1);
   font-size: 18px;
-  padding: 0 20px 0 50px;
+  padding: 0 20px 0 10px;
   color: inherit;
 }
 
@@ -143,4 +143,9 @@
   font-size: 16px;
   text-align: left;
   text-decoration: none;
+}
+
+.error-text {
+  font-size: 14px;
+  color: red;
 }
