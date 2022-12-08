@@ -7,7 +7,9 @@ import { ROLES } from "./Utilities/Constant";
 
 const PageNotFound = lazy(() => import("./Components/Error/page-not-found"));
 const Login = lazy(() => import("./Components/Authentication/Login"));
-const Home = lazy(() => import("./Components/Common/Home"));
+const SuperAdminHome = lazy(() => import("./Components/super-admin/Home"));
+const AdminHome = lazy(() => import("./Components/admin/Home"));
+const UserHome = lazy(() => import("./Components/user/Home"));
 
 const router = createBrowserRouter([
   {
@@ -18,7 +20,7 @@ const router = createBrowserRouter([
     path: ROUTES_PATH.SUPER_ADMIN.ROOT,
     element: (
       <PrivateRoute hasAuthority={[ROLES.SUPER_ADMIN.VALUE]}>
-        <Home />
+        <SuperAdminHome />
       </PrivateRoute>
     ),
     children: [
@@ -32,7 +34,7 @@ const router = createBrowserRouter([
     path: ROUTES_PATH.ADMIN.ROOT,
     element: (
       <PrivateRoute hasAuthority={[ROLES.ADMIN.VALUE]}>
-        <Home />
+        <AdminHome />
       </PrivateRoute>
     ),
     children: [
@@ -46,7 +48,7 @@ const router = createBrowserRouter([
     path: ROUTES_PATH.USER.ROOT,
     element: (
       <PrivateRoute hasAuthority={[ROLES.USER.VALUE]}>
-        <Home />
+        <UserHome />
       </PrivateRoute>
     ),
     children: [
