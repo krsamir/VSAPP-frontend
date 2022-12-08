@@ -8,7 +8,7 @@ function Login() {
     USERNAME: "username",
     PASSWORD: "password",
   });
-  const { handleLogin } = useLogin();
+  const { handleLogin, isLoading } = useLogin();
   const {
     register,
     handleSubmit,
@@ -63,7 +63,13 @@ function Login() {
               {errors[FIELD_NAMES.PASSWORD]?.message}
             </div>
           )}
-          <button type="submit">LOGIN</button>
+          <button
+            type="submit"
+            disabled={isLoading}
+            style={{ opacity: isLoading ? 0.5 : 1 }}
+          >
+            {isLoading ? "Please Wait" : "Login"}
+          </button>
         </form>
       </div>
     </div>
