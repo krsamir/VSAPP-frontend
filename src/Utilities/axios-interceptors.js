@@ -8,7 +8,6 @@ const cookies = new Cookie();
 const setupAxiosInterceptors = () => {
   const onRequestSuccess = (config) => {
     const token = cookies.get(TOKEN_NAME.SID);
-    console.log(token);
     if (token) {
       config.headers.Authorization = `Bearer ${token}`;
     }

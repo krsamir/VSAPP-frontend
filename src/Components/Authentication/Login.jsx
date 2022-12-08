@@ -1,10 +1,13 @@
 import React, { useState } from "react";
 import "./Login.css";
 import avtar from "../../Assets/avatar.png";
-
+import { useLogin } from "./Hooks/useLoginHook";
 function Login() {
-  const [data, setData] = useState({ username: "", password: "" });
-
+  const [data, setData] = useState({
+    username: "admin",
+    password: "admin",
+  });
+  const { handleLogin, isLoading } = useLogin();
   const handleChange = ({ target: { name, value } }) => {
     const parsedData = { ...data };
     parsedData[name] = value;
@@ -27,6 +30,7 @@ function Login() {
               autoComplete="false"
               name="username"
               onChange={handleChange}
+              value={data.username}
             />
             {/* <span className="material-symbols-outlined"> account_circle </span> */}
           </div>
@@ -37,10 +41,11 @@ function Login() {
               autoComplete="false"
               name="password"
               onChange={handleChange}
+              value={data.password}
             />
             {/* <span className="material-symbols-outlined"> lock </span> */}
           </div>
-          <button type="button" onClick={() => console.log(data)}>
+          <button type="button" onClick={() => handleLogin(data)}>
             LOGIN
           </button>
           <span>Forgot your credentials?</span>

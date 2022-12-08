@@ -1,8 +1,8 @@
 import React from "react";
 import "./App.css";
-import Login from "./Components/Authentication/Login";
 import { QueryClient, QueryClientProvider } from "react-query";
 import ErrorBoundary from "./Components/Error/Error-boundry";
+import Routes from "./Routes";
 const queryClient = new QueryClient({
   defaultOptions: { queries: { refetchOnWindowFocus: false } },
 });
@@ -12,7 +12,7 @@ function App() {
     <div className="app">
       <ErrorBoundary>
         <QueryClientProvider client={queryClient}>
-          <Login />
+          <Routes />
         </QueryClientProvider>
       </ErrorBoundary>
     </div>
