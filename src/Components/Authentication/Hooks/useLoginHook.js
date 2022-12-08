@@ -8,6 +8,8 @@ import {
 } from "../../../Utilities/Constant";
 import { loginApi } from "../Authentication.service";
 import { ROLES } from "../../../Utilities/Constant";
+import { ROUTES_PATH } from "../../../Utilities/Routes-config";
+
 export const useLogin = () => {
   const navigate = useNavigate();
 
@@ -21,16 +23,16 @@ export const useLogin = () => {
         if (data.data.role) {
           switch (data.data.role) {
             case ROLES.SUPER_ADMIN.VALUE:
-              navigateToPage("/home/superadmin");
+              navigateToPage(`/${ROUTES_PATH.SUPER_ADMIN.ROOT}`);
               break;
             case ROLES.ADMIN.VALUE:
-              navigateToPage("/home/admin");
+              navigateToPage(`/${ROUTES_PATH.ADMIN.ROOT}`);
               break;
             case ROLES.USER.VALUE:
-              navigateToPage("/");
+              navigateToPage(`${ROUTES_PATH.USER.ROOT}`);
               break;
             default:
-              navigateToPage("/login");
+              navigateToPage(`/${ROUTES_PATH.LOGIN}`);
               break;
           }
         } else {
@@ -48,7 +50,7 @@ export const useLogin = () => {
       } else {
         toast.error("Caught into some Problem");
       }
-      navigateToPage("/login");
+      navigateToPage(`/${ROUTES_PATH.LOGIN}`);
     },
   });
   return { handleLogin, isLoading };
