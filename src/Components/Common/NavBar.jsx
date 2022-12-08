@@ -10,7 +10,7 @@ import MenuItem from "@mui/material/MenuItem";
 import Menu from "@mui/material/Menu";
 import { useCookies } from "./hooks/useCookies";
 
-export default function NavBar() {
+export default function NavBar({ handleDrawer }) {
   const { removeCookies } = useCookies();
   const [anchorEl, setAnchorEl] = React.useState(null);
 
@@ -32,6 +32,7 @@ export default function NavBar() {
             color="inherit"
             aria-label="menu"
             sx={{ mr: 2 }}
+            onClick={() => handleDrawer(true)}
           >
             <MenuIcon />
           </IconButton>
