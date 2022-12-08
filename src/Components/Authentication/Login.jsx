@@ -7,14 +7,14 @@ function Login() {
     username: "admin",
     password: "admin",
   });
-  const { handleLogin, isLoading } = useLogin();
+  const { handleLogin } = useLogin();
   const handleChange = ({ target: { name, value } }) => {
     const parsedData = { ...data };
     parsedData[name] = value;
     setData(parsedData);
   };
   return (
-    <div className="app">
+    <div className="login-app">
       <div className="login">
         <div className="avatar">
           <img src={avtar} alt="Avtar" />

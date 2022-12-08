@@ -9,13 +9,13 @@ const queryClient = new QueryClient({
 
 function App() {
   return (
-    <div className="app">
+    <>
       <ErrorBoundary>
         <QueryClientProvider client={queryClient}>
           <Routes />
         </QueryClientProvider>
       </ErrorBoundary>
-    </div>
+    </>
   );
 }
 
