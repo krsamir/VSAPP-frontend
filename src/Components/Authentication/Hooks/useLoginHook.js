@@ -7,7 +7,7 @@ import {
   RESPONSE_STATUS,
 } from "../../../Utilities/Constant";
 import { loginApi } from "../Authentication.service";
-
+import { ROLES } from "../../../Utilities/Constant";
 export const useLogin = () => {
   const navigate = useNavigate();
 
@@ -16,13 +16,31 @@ export const useLogin = () => {
 
   const { mutate: handleLogin, isLoading } = useMutation(loginApi, {
     onSuccess(data) {
-      console.log(data.data);
       if (data.data.status === STATUS.SUCCESS) {
-        toast.success(data.data.message);
+        data.data.role && toast.success(data.data.message);
+        if (data.data.role) {
+          switch (data.data.role) {
+            case ROLES.SUPER_ADMIN.VALUE:
+              navigateToPage("/home/superadmin");
+              break;
+            case ROLES.ADMIN.VALUE:
+              navigateToPage("/home/admin");
+              break;
+            case ROLES.USER.VALUE:
+              navigateToPage("/");
+              break;
+            default:
+              navigateToPage("/login");
+              break;
+          }
+        } else {
+          toast.error("No Role assigned. Contact Admin", {
+            duration: 5000,
+          });
+        }
       } else {
         toast.error(data.data.message);
       }
-      navigateToPage("/home");
     },
     onError(e) {
       if (e?.response?.status === RESPONSE_STATUS.FORBIDDEN_403) {
@@ -30,7 +48,7 @@ export const useLogin = () => {
       } else {
         toast.error("Caught into some Problem");
       }
-      //   navigateToPage("/login");
+      navigateToPage("/login");
     },
   });
   return { handleLogin, isLoading };

@@ -8,6 +8,12 @@ const queryClient = new QueryClient({
 });
 
 function App() {
+  if (process.env.NODE_ENV !== "development") {
+    window.console.log = () => {};
+    window.console.info = () => {};
+    window.console.error = () => {};
+    window.console.warn = () => {};
+  }
   return (
     <>
       <ErrorBoundary>

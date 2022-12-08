@@ -7,6 +7,7 @@ const cookie = new Cookies();
 export const PrivateRoute = ({ children, ...rest }) => {
   const isAuthenticated =
     cookie.get("sid") !== undefined && cookie.get("sid") !== null;
+  !isAuthenticated && console.warn("AUTHENTICATION ERROR");
   const location = useLocation();
 
   if (!children) {
