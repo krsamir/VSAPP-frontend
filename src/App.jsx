@@ -2,7 +2,7 @@ import React from "react";
 import "./App.css";
 import { QueryClient, QueryClientProvider } from "react-query";
 import ErrorBoundary from "./Components/Error/Error-boundry";
-import Routes from "./Routes";
+import Routes from "./Routes1";
 const queryClient = new QueryClient({
   defaultOptions: { queries: { refetchOnWindowFocus: false } },
 });
