@@ -10,6 +10,7 @@ export const PrivateRoute = ({ children, hasAuthority = [], ...rest }) => {
     cookie.get("sid") !== undefined && cookie.get("sid") !== null;
   !isAuthenticated && console.warn("AUTHENTICATION ERROR");
   const role = cookie.get("role");
+  !hasAuthority.includes(role) && console.warn("AUTHORIZATION ERROR");
   if (typeof hasAuthority !== typeof []) {
     console.error(
       `Please pass an array of Roles e.x. [${ROLES.SUPER_ADMIN.NAME}, ${ROLES.ADMIN.NAME}, ${ROLES.USER.NAME}]`

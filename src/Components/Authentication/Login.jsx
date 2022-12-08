@@ -68,7 +68,7 @@ function Login() {
             disabled={isLoading}
             style={{ opacity: isLoading ? 0.5 : 1 }}
           >
-            {isLoading ? "Please Wait" : "Login"}
+            {isLoading ? "Please Wait..." : "Login"}
           </button>
         </form>
       </div>
