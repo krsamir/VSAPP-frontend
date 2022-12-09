@@ -2,6 +2,7 @@ export const ROUTES_PATH = Object.freeze({
   LOGIN: "login",
   SUPER_ADMIN: {
     ROOT: "superadmin",
+    TENANT: "tenants",
   },
   ADMIN: {
     ROOT: "admin",
@@ -10,3 +11,5 @@ export const ROUTES_PATH = Object.freeze({
     ROOT: "/",
   },
 });
+
+export const parsedRoute = (routeArray = []) => `/${routeArray.join("/")}`;

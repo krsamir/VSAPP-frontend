@@ -1,69 +1,84 @@
-import * as React from "react";
+import React, { useCallback, useMemo } from "react";
+import PropTypes from "prop-types";
 import Box from "@mui/material/Box";
 import Drawer from "@mui/material/Drawer";
-import Button from "@mui/material/Button";
 import List from "@mui/material/List";
 import Divider from "@mui/material/Divider";
 import ListItem from "@mui/material/ListItem";
 import ListItemButton from "@mui/material/ListItemButton";
 import ListItemIcon from "@mui/material/ListItemIcon";
 import ListItemText from "@mui/material/ListItemText";
-import InboxIcon from "@mui/icons-material/MoveToInbox";
-import MailIcon from "@mui/icons-material/Mail";
+import { useNavigate } from "react-router-dom";
 
-export default function LeftDrawer({ isOpened, slideDrawer }) {
-  const toggleDrawer = (open) => (event) => {
-    if (
-      event.type === "keydown" &&
-      (event.key === "Tab" || event.key === "Shift")
-    ) {
-      return;
-    }
-    slideDrawer(open);
-  };
+export default function LeftDrawer({
+  isOpened,
+  slideDrawer,
+  leftDrawerData = [],
+}) {
+  const navigate = useNavigate();
 
-  const list = () => (
-    <Box
-      sx={{ width: 250 }}
-      role="presentation"
-      onClick={toggleDrawer(false)}
-      onKeyDown={toggleDrawer(false)}
-    >
-      <List>
-        {["Inbox", "Starred", "Send email", "Drafts"].map((text, index) => (
-          <ListItem key={text} disablePadding>
-            <ListItemButton>
-              <ListItemIcon>
-                {index % 2 === 0 ? <InboxIcon /> : <MailIcon />}
-              </ListItemIcon>
-              <ListItemText primary={text} />
-            </ListItemButton>
-          </ListItem>
-        ))}
-      </List>
-      <Divider />
-      <List>
-        {["All mail", "Trash", "Spam"].map((text, index) => (
-          <ListItem key={text} disablePadding>
-            <ListItemButton>
-              <ListItemIcon>
-                {index % 2 === 0 ? <InboxIcon /> : <MailIcon />}
-              </ListItemIcon>
-              <ListItemText primary={text} />
-            </ListItemButton>
-          </ListItem>
-        ))}
-      </List>
-    </Box>
+  const handleRedirect = useCallback((path) => navigate(path), [navigate]);
+
+  const toggleDrawer = useCallback(
+    (open) => (event) => {
+      if (
+        event.type === "keydown" &&
+        (event.key === "Tab" || event.key === "Shift")
+      ) {
+        return;
+      }
+      slideDrawer(open);
+    },
+    [slideDrawer]
+  );
+
+  const list = useMemo(
+    () => (
+      <Box
+        sx={{ width: 250 }}
+        role="presentation"
+        onClick={toggleDrawer(false)}
+        onKeyDown={toggleDrawer(false)}
+      >
+        <List>
+          {leftDrawerData.map(({ id, name, redirect, icon }) => (
+            <ListItem
+              key={id}
+              disablePadding
+              onClick={() => handleRedirect(redirect)}
+            >
+              <ListItemButton>
+                <ListItemIcon>{icon}</ListItemIcon>
+                <ListItemText primary={name} />
+              </ListItemButton>
+            </ListItem>
+          ))}
+        </List>
+        <Divider />
+      </Box>
+    ),
+    [handleRedirect, leftDrawerData, toggleDrawer]
   );
 
   return (
     <div>
       <React.Fragment>
         <Drawer anchor={"right"} open={isOpened} onClose={toggleDrawer(false)}>
-          {list()}
+          {list}
         </Drawer>
       </React.Fragment>
     </div>
   );
 }
+
+LeftDrawer.propTypes = {
+  isOpened: PropTypes.bool,
+  slideDrawer: PropTypes.func,
+  leftDrawerData: PropTypes.array,
+};
+
+LeftDrawer.defaultProps = {
+  isOpened: false,
+  slideDrawer: () => null,
+  leftDrawerData: [],
+};

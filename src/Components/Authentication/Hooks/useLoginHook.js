@@ -8,7 +8,7 @@ import {
 } from "../../../Utilities/Constant";
 import { loginApi } from "../Authentication.service";
 import { ROLES } from "../../../Utilities/Constant";
-import { ROUTES_PATH } from "../../../Utilities/Routes-config";
+import { ROUTES_PATH, parsedRoute } from "../../../Utilities/Routes-config";
 
 export const useLogin = () => {
   const navigate = useNavigate();
@@ -23,16 +23,16 @@ export const useLogin = () => {
         if (data.data.role) {
           switch (data.data.role) {
             case ROLES.SUPER_ADMIN.VALUE:
-              navigateToPage(`/${ROUTES_PATH.SUPER_ADMIN.ROOT}`);
+              navigateToPage(parsedRoute([ROUTES_PATH.SUPER_ADMIN.ROOT]));
               break;
             case ROLES.ADMIN.VALUE:
-              navigateToPage(`/${ROUTES_PATH.ADMIN.ROOT}`);
+              navigateToPage(parsedRoute([ROUTES_PATH.ADMIN.ROOT]));
               break;
             case ROLES.USER.VALUE:
-              navigateToPage(`${ROUTES_PATH.USER.ROOT}`);
+              navigateToPage(parsedRoute([]));
               break;
             default:
-              navigateToPage(`/${ROUTES_PATH.LOGIN}`);
+              navigateToPage(parsedRoute([ROUTES_PATH.LOGIN]));
               break;
           }
         } else {
@@ -50,7 +50,7 @@ export const useLogin = () => {
       } else {
         toast.error("Caught into some Problem");
       }
-      navigateToPage(`/${ROUTES_PATH.LOGIN}`);
+      navigateToPage(parsedRoute([ROUTES_PATH.LOGIN]));
     },
   });
   return { handleLogin, isLoading };
