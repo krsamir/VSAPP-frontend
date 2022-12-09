@@ -1,4 +1,5 @@
 import React, { useState } from "react";
+import { Outlet } from "react-router-dom";
 import LeftDrawer from "../Common/LeftDrawer";
 import NavBar from "../Common/NavBar";
 import { superAdminLeftDrawerData } from "../Common/leftDrawer-data";
@@ -16,6 +17,9 @@ function Home() {
         slideDrawer={(flag) => setOpenDrawer(flag)}
         leftDrawerData={superAdminLeftDrawerData}
       />
+      <div style={{ marginTop: "64px" }}>
+        <Outlet />
+      </div>
     </>
   );
 }

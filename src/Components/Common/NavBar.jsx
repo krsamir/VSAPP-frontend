@@ -11,9 +11,13 @@ import MenuItem from "@mui/material/MenuItem";
 import Menu from "@mui/material/Menu";
 import { useCookies } from "./hooks/useCookies";
 import { ROLES } from "../../Utilities/Constant";
+import { useNavigate } from "react-router-dom";
+import { ROUTES_PATH, parsedRoute } from "../../Utilities/Routes-config";
 
 export default function NavBar({ handleDrawer, role }) {
   const { removeCookies } = useCookies();
+  const navigate = useNavigate();
+
   const [anchorEl, setAnchorEl] = React.useState(null);
 
   const handleMenu = (event) => {
@@ -24,9 +28,26 @@ export default function NavBar({ handleDrawer, role }) {
     setAnchorEl(null);
   };
   const handleLogout = () => removeCookies();
+
+  const handleHomeRedirection = () => {
+    switch (role) {
+      case ROLES.SUPER_ADMIN.NAME:
+        navigate(parsedRoute([ROUTES_PATH.SUPER_ADMIN.ROOT]));
+        break;
+      case ROLES.ADMIN.NAME:
+        navigate(parsedRoute([ROUTES_PATH.ADMIN.ROOT]));
+        break;
+      case ROLES.USER.NAME:
+        navigate(parsedRoute([]));
+        break;
+      default:
+        navigate(parsedRoute([ROUTES_PATH.LOGIN]));
+        break;
+    }
+  };
   return (
     <Box sx={{ flexGrow: 1 }}>
-      <AppBar position="static">
+      <AppBar position="fixed">
         <Toolbar>
           {(role === ROLES.SUPER_ADMIN.NAME || role === ROLES.ADMIN.NAME) && (
             <IconButton
@@ -40,7 +61,12 @@ export default function NavBar({ handleDrawer, role }) {
               <MenuIcon />
             </IconButton>
           )}
-          <Typography variant="h6" component="div" sx={{ flexGrow: 1 }}>
+          <Typography
+            variant="h6"
+            component="div"
+            sx={{ flexGrow: 1, cursor: "pointer" }}
+            onClick={handleHomeRedirection}
+          >
             MY SHOP
           </Typography>
           {

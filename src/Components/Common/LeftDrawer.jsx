@@ -45,7 +45,10 @@ export default function LeftDrawer({
             <ListItem
               key={id}
               disablePadding
-              onClick={() => handleRedirect(redirect)}
+              onClick={() => {
+                toggleDrawer(false);
+                handleRedirect(redirect);
+              }}
             >
               <ListItemButton>
                 <ListItemIcon>{icon}</ListItemIcon>
