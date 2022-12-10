@@ -25,7 +25,7 @@ export const PrivateRoute = ({ children, hasAuthority = [], ...rest }) => {
       ]);
     }
   }
-  console.log(`☣Authority -> ${hasAuthority}⚠`);
+  // console.log(`☣Authority -> ${hasAuthority}⚠`);
   const location = useLocation();
 
   if (!children) {

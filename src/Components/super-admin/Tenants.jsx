@@ -1,10 +1,13 @@
 import React from "react";
-
+import { useStoreState } from "easy-peasy";
+import { useGetTenants } from "./Hooks/useTenants";
+// import Styled from "styled-components";
 function Tenants() {
-  console.log("tenant");
-  return (
-    <div style={{ height: "100vh", backgroundColor: "green" }}>Tenants</div>
-  );
+  const { tenants } = useStoreState((state) => state.tenant);
+  // console.log(tenants);
+  const { isLoading } = useGetTenants();
+  // console.log(isLoading);
+  return <>Tenants</>;
 }
 
 export default Tenants;

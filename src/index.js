@@ -1,17 +1,21 @@
 import React from "react";
 import ReactDOM from "react-dom/client";
+import { StoreProvider } from "easy-peasy";
 import "./index.css";
 import App from "./App";
 import reportWebVitals from "./reportWebVitals";
 import { Toaster } from "react-hot-toast";
 import setupAxiosInterceptors from "./Utilities/axios-interceptors";
-
+import store from "./global-state/store";
 setupAxiosInterceptors();
 const root = ReactDOM.createRoot(document.getElementById("root"));
 root.render(
   <React.StrictMode>
-    <Toaster />
-    <App />
+    <StoreProvider store={store}>
+      <Toaster />
+      <App />
+    </StoreProvider>
+    ,
   </React.StrictMode>
 );
 
