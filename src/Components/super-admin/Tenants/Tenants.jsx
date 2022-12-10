@@ -1,6 +1,6 @@
 import React from "react";
 import { useStoreState } from "easy-peasy";
-import { useGetTenants } from "./Hooks/useTenants";
+import { useGetTenants } from "../Hooks/useTenants";
 // import Styled from "styled-components";
 function Tenants() {
   const { tenants } = useStoreState((state) => state.tenant);

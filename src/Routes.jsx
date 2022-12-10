@@ -10,7 +10,7 @@ const Login = lazy(() => import("./Components/Authentication/Login"));
 const SuperAdminHome = lazy(() => import("./Components/super-admin/Home"));
 const AdminHome = lazy(() => import("./Components/admin/Home"));
 const UserHome = lazy(() => import("./Components/user/Home"));
-const Tenants = lazy(() => import("./Components/super-admin/Tenants"));
+const Tenants = lazy(() => import("./Components/super-admin/Tenants/Tenants"));
 const router = createBrowserRouter([
   {
     path: ROUTES_PATH.LOGIN,
