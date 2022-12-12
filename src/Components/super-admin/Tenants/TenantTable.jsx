@@ -2,9 +2,18 @@ import React, { useState, useContext } from "react";
 import { AgGridReact } from "ag-grid-react";
 import Styled from "styled-components";
 import { SuperAdminContext } from "../Context/super-admin-context";
+import EditIcon from "@mui/icons-material/Edit";
+
 const TableWrapper = Styled.div`
     margin-left: 20px;
     margin-top:20px;
+`;
+const StyledEditIcon = Styled(EditIcon)`
+  cursor: pointer;
+`;
+const IconWrapper = Styled.div`
+  display:flex;
+  justify-content: center;
 `;
 function TenantTable({ data = [] }) {
   const {
@@ -13,16 +22,14 @@ function TenantTable({ data = [] }) {
   const [, setGridApi] = useState(null);
   const actionCellRenderer = ({ data }) => {
     return (
-      <div>
-        <div
+      <IconWrapper>
+        <StyledEditIcon
           onClick={() => {
             setTenantData(data);
             setModalState(true);
           }}
-        >
-          Click
-        </div>
-      </div>
+        ></StyledEditIcon>
+      </IconWrapper>
     );
   };
   const columnDefs = [

@@ -110,7 +110,13 @@ export default function ModelComponent() {
     setTenantData({});
   };
   const onSubmit = (data) => {
-    console.log(data);
+    if (data?.id) {
+      // update existing value
+      console.log(`edit`);
+    } else {
+      // create new entry
+      console.log(`new`);
+    }
     handleClose();
     reset({ id: null, name: "", branch: "" });
   };
