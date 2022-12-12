@@ -1,13 +1,18 @@
 import React from "react";
 import { useStoreState } from "easy-peasy";
 import { useGetTenants } from "../Hooks/useTenants";
-// import Styled from "styled-components";
+import CreateTenant from "./create-tenant";
+import TenantTable from "./TenantTable";
+import { SuperAdminProvider } from "../Context/super-admin-provider";
 function Tenants() {
   const { tenants } = useStoreState((state) => state.tenant);
-  // console.log(tenants);
   const { isLoading } = useGetTenants();
-  // console.log(isLoading);
-  return <>Tenants</>;
+  return (
+    <SuperAdminProvider>
+      <CreateTenant />
+      <TenantTable data={tenants ?? []} isLoading={isLoading} />
+    </SuperAdminProvider>
+  );
 }
 
 export default Tenants;

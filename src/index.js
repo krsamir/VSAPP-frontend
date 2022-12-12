@@ -7,6 +7,9 @@ import reportWebVitals from "./reportWebVitals";
 import { Toaster } from "react-hot-toast";
 import setupAxiosInterceptors from "./Utilities/axios-interceptors";
 import store from "./global-state/store";
+import "ag-grid-community/dist/styles/ag-grid.css";
+import "ag-grid-community/dist/styles/ag-theme-alpine.css";
+
 setupAxiosInterceptors();
 const root = ReactDOM.createRoot(document.getElementById("root"));
 root.render(
@@ -15,7 +18,6 @@ root.render(
       <Toaster />
       <App />
     </StoreProvider>
-    ,
   </React.StrictMode>
 );
 
