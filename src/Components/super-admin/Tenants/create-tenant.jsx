@@ -94,7 +94,7 @@ export default function CreateTenantComponent() {
     },
   });
 
-  const checkIsEdit = useCallback(
+  const checkIsEdit = useMemo(
     () => Boolean(tenantData?.id) || false,
     [tenantData]
   );
@@ -105,7 +105,7 @@ export default function CreateTenantComponent() {
     shouldValidate: true,
   };
   useEffect(() => {
-    if (checkIsEdit()) {
+    if (checkIsEdit) {
       const { name, branch, id, status } = tenantData;
       setValue(FIELDS.ID, id);
       setValue(FIELDS.NAME, name, {
@@ -114,9 +114,7 @@ export default function CreateTenantComponent() {
       setValue(FIELDS.BRANCH, branch, {
         ...fieldData,
       });
-      setValue(FIELDS.STATUS, status, {
-        ...fieldData,
-      });
+      setValue(FIELDS.STATUS, status);
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [tenantData]);
@@ -165,7 +163,7 @@ export default function CreateTenantComponent() {
     },
     [createTenant, handleClose, handleFieldsReset]
   );
-  console.log(checkIsEdit());
+
   return (
     <div>
       <StyledButton variant="outlined" onClick={handleClickOpen}>
@@ -234,14 +232,14 @@ export default function CreateTenantComponent() {
                 </Grid>
               </Grid>
 
-              {checkIsEdit() && (
+              {checkIsEdit && (
                 <Grid container spacing={2}>
                   <Grid item xs={12} md={6}>
                     <Controller
                       name={FIELDS.STATUS}
                       control={control}
                       render={({ field }) => (
-                        <Switch {...field} defaultChecked />
+                        <Switch {...field} checked={field.value} />
                       )}
                     />
                   </Grid>
