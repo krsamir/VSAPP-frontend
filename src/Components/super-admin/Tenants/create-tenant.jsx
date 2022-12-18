@@ -1,17 +1,24 @@
-import React, { useContext, useEffect } from "react";
+import React, { useContext, useEffect, useMemo, useCallback } from "react";
 import PropTypes from "prop-types";
 import Button from "@mui/material/Button";
 import { styled } from "@mui/material/styles";
 import Dialog from "@mui/material/Dialog";
-import DialogTitle from "@mui/material/DialogTitle";
-import DialogContent from "@mui/material/DialogContent";
-import DialogActions from "@mui/material/DialogActions";
-import IconButton from "@mui/material/IconButton";
+import {
+  DialogTitle,
+  DialogContent,
+  DialogActions,
+  IconButton,
+  Grid,
+  TextField,
+  Switch,
+} from "@mui/material";
 import CloseIcon from "@mui/icons-material/Close";
-import { Grid, TextField } from "@mui/material";
 import Styled from "styled-components";
 import { useForm, Controller } from "react-hook-form";
 import { SuperAdminContext } from "../Context/super-admin-context";
+import { useCreateTenants } from "../Hooks/useTenants";
+import { STATUS } from "../../../Utilities/Constant";
+
 const Wrapper = Styled.div`
     width: auto;
     overflow: hidden;
@@ -30,6 +37,13 @@ const BootstrapDialog = styled(Dialog)(({ theme }) => ({
     padding: theme.spacing(1),
   },
 }));
+
+const FIELDS = Object.freeze({
+  ID: "id",
+  NAME: "name",
+  BRANCH: "branch",
+  STATUS: "status",
+});
 
 function BootstrapDialogTitle(props) {
   const { children, onClose, ...other } = props;
@@ -60,10 +74,11 @@ BootstrapDialogTitle.propTypes = {
   onClose: PropTypes.func.isRequired,
 };
 
-export default function ModelComponent() {
+export default function CreateTenantComponent() {
   const {
     providerState: { tenantData, open, setModalState, setTenantData },
   } = useContext(SuperAdminContext);
+  const { createTenant } = useCreateTenants();
   const {
     control,
     handleSubmit,
@@ -72,24 +87,34 @@ export default function ModelComponent() {
     reset,
   } = useForm({
     defaultValues: {
-      id: null,
-      name: "",
-      branch: "",
+      [FIELDS.ID]: null,
+      [FIELDS.NAME]: "",
+      [FIELDS.BRANCH]: "",
+      [FIELDS.STATUS]: true,
     },
   });
+
+  const checkIsEdit = useCallback(
+    () => Boolean(tenantData?.id) || false,
+    [tenantData]
+  );
+
   const fieldData = {
     shouldTouch: true,
     shouldDirty: true,
     shouldValidate: true,
   };
   useEffect(() => {
-    if (tenantData?.id) {
-      const { name, branch, id } = tenantData;
-      setValue("id", id);
-      setValue("name", name, {
+    if (checkIsEdit()) {
+      const { name, branch, id, status } = tenantData;
+      setValue(FIELDS.ID, id);
+      setValue(FIELDS.NAME, name, {
         ...fieldData,
       });
-      setValue("branch", branch, {
+      setValue(FIELDS.BRANCH, branch, {
+        ...fieldData,
+      });
+      setValue(FIELDS.STATUS, status, {
         ...fieldData,
       });
     }
@@ -97,30 +122,50 @@ export default function ModelComponent() {
   }, [tenantData]);
   useEffect(() => {
     if (!open) {
-      reset({ id: null, name: "", branch: "" });
+      handleFieldsReset();
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [open]);
 
-  const handleClickOpen = () => {
-    setModalState(true);
-  };
-  const handleClose = () => {
+  const handleClickOpen = useCallback(
+    () => setModalState(true),
+    [setModalState]
+  );
+  const handleClose = useCallback(() => {
     setModalState(false);
     setTenantData({});
-  };
-  const onSubmit = (data) => {
-    if (data?.id) {
-      // update existing value
-      console.log(`edit`);
-    } else {
-      // create new entry
-      console.log(`new`);
-    }
-    handleClose();
-    reset({ id: null, name: "", branch: "" });
-  };
+  }, [setModalState, setTenantData]);
 
+  const handleFieldsReset = useCallback(
+    () =>
+      reset({
+        [FIELDS.ID]: null,
+        [FIELDS.NAME]: "",
+        [FIELDS.BRANCH]: "",
+        [FIELDS.STATUS]: true,
+      }),
+    [reset]
+  );
+  const onSubmit = useCallback(
+    (data) => {
+      if (data?.id) {
+        // update existing value
+      } else {
+        // create new entry
+        delete data.id;
+        createTenant(data, {
+          onSuccess(data) {
+            if (data?.data?.status === STATUS.SUCCESS) {
+              handleClose();
+              handleFieldsReset();
+            }
+          },
+        });
+      }
+    },
+    [createTenant, handleClose, handleFieldsReset]
+  );
+  console.log(checkIsEdit());
   return (
     <div>
       <StyledButton variant="outlined" onClick={handleClickOpen}>
@@ -144,51 +189,64 @@ export default function ModelComponent() {
             <Wrapper>
               <Grid container spacing={2}>
                 <Grid item xs={12} md={6}>
-                  {" "}
                   <Controller
-                    name="name"
+                    name={FIELDS.NAME}
                     control={control}
                     render={({ field }) => (
                       <TextField
-                        label="Name"
+                        label={FIELDS.NAME}
                         variant="filled"
                         fullWidth
                         {...field}
-                        error={errors?.name?.type === "required"}
-                        helperText={errors?.name?.message}
+                        error={errors?.[FIELDS.NAME]?.type === "required"}
+                        helperText={errors?.[FIELDS.NAME]?.message}
                       />
                     )}
                     rules={{
                       required: {
                         value: true,
-                        message: "Name cannot be empty.",
+                        message: `${[FIELDS.NAME]} cannot be empty.`,
                       },
                     }}
                   />
                 </Grid>
                 <Grid item xs={12} md={6}>
                   <Controller
-                    name="branch"
+                    name={FIELDS.BRANCH}
                     control={control}
                     render={({ field }) => (
                       <TextField
-                        label="Branch"
+                        label={FIELDS.BRANCH}
                         variant="filled"
                         fullWidth
                         {...field}
-                        error={errors?.branch?.type === "required"}
-                        helperText={errors?.branch?.message}
+                        error={errors?.[FIELDS.BRANCH]?.type === "required"}
+                        helperText={errors?.[FIELDS.BRANCH]?.message}
                       />
                     )}
                     rules={{
                       required: {
                         value: true,
-                        message: "Branch cannot be empty.",
+                        message: `${[FIELDS.BRANCH]} cannot be empty.`,
                       },
                     }}
                   />
                 </Grid>
               </Grid>
+
+              {checkIsEdit() && (
+                <Grid container spacing={2}>
+                  <Grid item xs={12} md={6}>
+                    <Controller
+                      name={FIELDS.STATUS}
+                      control={control}
+                      render={({ field }) => (
+                        <Switch {...field} defaultChecked />
+                      )}
+                    />
+                  </Grid>
+                </Grid>
+              )}
             </Wrapper>
           </DialogContent>
           <DialogActions>

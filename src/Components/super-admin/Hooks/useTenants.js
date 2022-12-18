@@ -1,5 +1,5 @@
 import { useMemo } from "react";
-import { useQuery } from "react-query";
+import { useMutation, useQuery } from "react-query";
 import { QUERY_KEYS } from "../../../Utilities/query-keys";
 import { useStoreActions } from "easy-peasy";
 import { toast } from "react-hot-toast";
@@ -7,15 +7,9 @@ import { toast } from "react-hot-toast";
 export const useGetTenants = () => {
   const { fetchTenantsList } = useStoreActions((store) => store.tenant);
   const { isLoading } = useQuery(QUERY_KEYS.GET_TENANTS, fetchTenantsList, {
-    onSuccess(data) {
-      if (data) {
-        data?.status !== 1 && toast.error(data?.message);
-      }
-    },
     onError(e) {
-      if (e?.response) {
-        toast.error("Issue while fetching tenants.");
-      }
+      console.log(e);
+      toast.error(`Issue while fetching Tenants List.`);
     },
   });
   return useMemo(
@@ -24,4 +18,15 @@ export const useGetTenants = () => {
     }),
     [isLoading]
   );
+};
+
+export const useCreateTenants = () => {
+  const { createTenants } = useStoreActions((store) => store.tenant);
+  const { mutate: createTenant } = useMutation(createTenants, {
+    onError(e) {
+      console.log(e);
+      toast.error(`Issue while creating Tenants.`);
+    },
+  });
+  return useMemo(() => ({ createTenant }), [createTenant]);
 };

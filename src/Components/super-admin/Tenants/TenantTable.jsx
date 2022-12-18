@@ -3,6 +3,8 @@ import { AgGridReact } from "ag-grid-react";
 import Styled from "styled-components";
 import { SuperAdminContext } from "../Context/super-admin-context";
 import EditIcon from "@mui/icons-material/Edit";
+import { useStoreState } from "easy-peasy";
+import { useGetTenants } from "../Hooks/useTenants";
 
 const TableWrapper = Styled.div`
     margin-left: 20px;
@@ -15,11 +17,13 @@ const IconWrapper = Styled.div`
   display:flex;
   justify-content: center;
 `;
-function TenantTable({ data = [] }) {
+function TenantTable() {
   const {
     providerState: { setTenantData, setModalState },
   } = useContext(SuperAdminContext);
   const [, setGridApi] = useState(null);
+  const { tenants } = useStoreState((state) => state.tenant);
+  useGetTenants();
   const actionCellRenderer = ({ data }) => {
     return (
       <IconWrapper>
@@ -74,10 +78,10 @@ function TenantTable({ data = [] }) {
   return (
     <TableWrapper
       className="ag-theme-alpine"
-      style={{ width: 900, height: 500 }}
+      style={{ width: 900, height: 520 }}
     >
       <AgGridReact
-        rowData={data}
+        rowData={tenants}
         columnDefs={columnDefs}
         defaultColDef={defaultColDef}
         onGridReady={onGridReady}
