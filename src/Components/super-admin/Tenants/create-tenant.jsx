@@ -179,6 +179,9 @@ export default function CreateTenantComponent() {
     [createTenant, handleSuccess, updateTenantData]
   );
 
+  const capitalize = (string) =>
+    string.charAt(0).toUpperCase() + string.slice(1);
+
   return (
     <div>
       <StyledButton variant="outlined" onClick={handleClickOpen}>
@@ -207,7 +210,7 @@ export default function CreateTenantComponent() {
                     control={control}
                     render={({ field }) => (
                       <TextField
-                        label={FIELDS.NAME}
+                        label={capitalize(FIELDS.NAME)}
                         variant="filled"
                         fullWidth
                         {...field}
@@ -218,7 +221,7 @@ export default function CreateTenantComponent() {
                     rules={{
                       required: {
                         value: true,
-                        message: `${[FIELDS.NAME]} cannot be empty.`,
+                        message: `${capitalize(FIELDS.NAME)} cannot be empty.`,
                       },
                     }}
                   />
@@ -229,7 +232,7 @@ export default function CreateTenantComponent() {
                     control={control}
                     render={({ field }) => (
                       <TextField
-                        label={FIELDS.BRANCH}
+                        label={capitalize(FIELDS.BRANCH)}
                         variant="filled"
                         fullWidth
                         {...field}
@@ -240,7 +243,9 @@ export default function CreateTenantComponent() {
                     rules={{
                       required: {
                         value: true,
-                        message: `${[FIELDS.BRANCH]} cannot be empty.`,
+                        message: `${capitalize(
+                          FIELDS.BRANCH
+                        )} cannot be empty.`,
                       },
                     }}
                   />
