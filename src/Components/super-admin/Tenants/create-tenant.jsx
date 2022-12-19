@@ -16,7 +16,7 @@ import CloseIcon from "@mui/icons-material/Close";
 import Styled from "styled-components";
 import { useForm, Controller } from "react-hook-form";
 import { SuperAdminContext } from "../Context/super-admin-context";
-import { useCreateTenants } from "../Hooks/useTenants";
+import { useCreateTenants, usePatchTenants } from "../Hooks/useTenants";
 import { STATUS } from "../../../Utilities/Constant";
 
 const Wrapper = Styled.div`
@@ -78,7 +78,10 @@ export default function CreateTenantComponent() {
   const {
     providerState: { tenantData, open, setModalState, setTenantData },
   } = useContext(SuperAdminContext);
+
   const { createTenant } = useCreateTenants();
+  const { updateTenantData } = usePatchTenants();
+
   const {
     control,
     handleSubmit,
@@ -144,24 +147,36 @@ export default function CreateTenantComponent() {
       }),
     [reset]
   );
+
+  const handleSuccess = useCallback(() => {
+    handleClose();
+    handleFieldsReset();
+  }, [handleClose, handleFieldsReset]);
+
   const onSubmit = useCallback(
     (data) => {
       if (data?.id) {
         // update existing value
+        updateTenantData(data, {
+          onSuccess(data) {
+            if (data?.data?.status === STATUS.SUCCESS) {
+              handleSuccess();
+            }
+          },
+        });
       } else {
         // create new entry
         delete data.id;
         createTenant(data, {
           onSuccess(data) {
             if (data?.data?.status === STATUS.SUCCESS) {
-              handleClose();
-              handleFieldsReset();
+              handleSuccess();
             }
           },
         });
       }
     },
-    [createTenant, handleClose, handleFieldsReset]
+    [createTenant, handleSuccess, updateTenantData]
   );
 
   return (

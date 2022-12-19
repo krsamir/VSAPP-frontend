@@ -1,8 +1,9 @@
 import { action, thunk } from "easy-peasy";
 import { toast } from "react-hot-toast";
 import {
-  fetchTenants,
-  addTenants,
+  fetchTenantApi,
+  addTenantApi,
+  updateTenantApi,
 } from "../Components/super-admin/api-service";
 import { STATUS } from "../Utilities/Constant";
 
@@ -14,8 +15,12 @@ export const tenantModel = {
   updateTenantsArray: action((state, payload) => {
     state.tenants.push(payload);
   }),
+  patchTenantsArray: action((state, payload) => {
+    const index = state.tenants.findIndex((obj) => obj.id === payload?.id);
+    state.tenants[index] = payload;
+  }),
   fetchTenantsList: thunk(async ({ addToTenantsArray }, _, { fail }) => {
-    return await fetchTenants()
+    return await fetchTenantApi()
       .then((response) => {
         const {
           data: { status, data, message },
@@ -34,7 +39,7 @@ export const tenantModel = {
   }),
   createTenants: thunk(async ({ updateTenantsArray }, payload, { fail }) => {
     try {
-      const response = await addTenants(payload);
+      const response = await addTenantApi(payload);
       const {
         data: { status, message, data, issue },
       } = response;
@@ -51,4 +56,29 @@ export const tenantModel = {
       throw new Error(e);
     }
   }),
+  updateTenantThunk: thunk(
+    async ({ patchTenantsArray }, payload, { getState, fail }) => {
+      try {
+        const response = await updateTenantApi(payload);
+        const {
+          data: { status, message, issue },
+        } = response;
+        if (status === STATUS.SUCCESS) {
+          const data = getState();
+          console.log(data);
+          patchTenantsArray(payload);
+          toast.success(message);
+        } else if (status === STATUS.DUPLICATE) {
+          toast.error(message, { duration: 2000 });
+          toast(issue, { duration: 5000 });
+        } else {
+          toast.error(message, { duration: 2000 });
+        }
+        return response;
+      } catch (e) {
+        fail(e);
+        throw new Error(e);
+      }
+    }
+  ),
 };

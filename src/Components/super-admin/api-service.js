@@ -1,4 +1,6 @@
 import axios from "axios";
 
-export const fetchTenants = () => axios.get("/tenant");
-export const addTenants = (payload) => axios.post("/tenant", payload);
+const TENANT_BASE_URL = "/tenant";
+export const fetchTenantApi = () => axios.get(TENANT_BASE_URL);
+export const addTenantApi = (payload) => axios.post(TENANT_BASE_URL, payload);
+export const updateTenantApi = (payload) => axios.put(TENANT_BASE_URL, payload);

@@ -30,3 +30,14 @@ export const useCreateTenants = () => {
   });
   return useMemo(() => ({ createTenant }), [createTenant]);
 };
+
+export const usePatchTenants = () => {
+  const { updateTenantThunk } = useStoreActions((store) => store.tenant);
+  const { mutate: updateTenantData } = useMutation(updateTenantThunk, {
+    onError(e) {
+      console.log(e);
+      toast.error(`Issue while updating Tenants.`);
+    },
+  });
+  return useMemo(() => ({ updateTenantData }), [updateTenantData]);
+};
