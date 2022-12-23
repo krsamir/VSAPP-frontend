@@ -47,7 +47,9 @@ export default function LeftDrawer({
               disablePadding
               onClick={() => {
                 toggleDrawer(false);
-                handleRedirect(redirect);
+                setTimeout(() => {
+                  handleRedirect(redirect);
+                }, 500);
               }}
             >
               <ListItemButton>
