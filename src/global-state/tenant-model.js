@@ -4,6 +4,7 @@ import {
   fetchTenantApi,
   addTenantApi,
   updateTenantApi,
+  deleteTenantApi,
 } from "../Components/super-admin/api-service";
 import { STATUS } from "../Utilities/Constant";
 
@@ -18,6 +19,12 @@ export const tenantModel = {
   patchTenantsArray: action((state, payload) => {
     const index = state.tenants.findIndex((obj) => obj.id === payload?.id);
     state.tenants[index] = payload;
+  }),
+  deleteTenantFromArray: action((state, payload) => {
+    const index = state.tenants.findIndex((obj) => obj.id === payload);
+    if (index > -1) {
+      state.tenants?.splice(index, 1);
+    }
   }),
   fetchTenantsList: thunk(async ({ addToTenantsArray }, _, { fail }) => {
     return await fetchTenantApi()
@@ -56,21 +63,37 @@ export const tenantModel = {
       throw new Error(e);
     }
   }),
-  updateTenantThunk: thunk(
-    async ({ patchTenantsArray }, payload, { getState, fail }) => {
+  updateTenantThunk: thunk(async ({ patchTenantsArray }, payload, { fail }) => {
+    try {
+      const response = await updateTenantApi(payload);
+      const {
+        data: { status, message, issue },
+      } = response;
+      if (status === STATUS.SUCCESS) {
+        patchTenantsArray(payload);
+        toast.success(message);
+      } else if (status === STATUS.DUPLICATE) {
+        toast.error(message, { duration: 2000 });
+        toast(issue, { duration: 5000 });
+      } else {
+        toast.error(message, { duration: 2000 });
+      }
+      return response;
+    } catch (e) {
+      fail(e);
+      throw new Error(e);
+    }
+  }),
+  deleteTenantThunk: thunk(
+    async ({ deleteTenantFromArray }, payload, { fail }) => {
       try {
-        const response = await updateTenantApi(payload);
+        const response = await deleteTenantApi(payload);
         const {
-          data: { status, message, issue },
+          data: { status, message },
         } = response;
         if (status === STATUS.SUCCESS) {
-          const data = getState();
-          console.log(data);
-          patchTenantsArray(payload);
+          deleteTenantFromArray(payload);
           toast.success(message);
-        } else if (status === STATUS.DUPLICATE) {
-          toast.error(message, { duration: 2000 });
-          toast(issue, { duration: 5000 });
         } else {
           toast.error(message, { duration: 2000 });
         }

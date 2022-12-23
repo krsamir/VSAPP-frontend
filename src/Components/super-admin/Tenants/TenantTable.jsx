@@ -5,7 +5,7 @@ import { SuperAdminContext } from "../Context/super-admin-context";
 import EditIcon from "@mui/icons-material/Edit";
 import DeleteIcon from "@mui/icons-material/Delete";
 import { useStoreState } from "easy-peasy";
-import { useGetTenants } from "../Hooks/useTenants";
+import { useGetTenants, useDeleteTenants } from "../Hooks/useTenants";
 import DeleteDialogComponent from "../../Common/Delete-Dialog";
 
 const TableWrapper = Styled.div`
@@ -31,6 +31,7 @@ function TenantTable() {
   const [data, setData] = React.useState(null);
   const { tenants } = useStoreState((state) => state.tenant);
   useGetTenants();
+  const { deleteTenantData } = useDeleteTenants();
   const editCellRenderer = ({ data }) => {
     return (
       <IconWrapper>
@@ -104,13 +105,18 @@ function TenantTable() {
   const handleOpenDialog = (item) => {
     setOpen(true);
     setData(item);
-    console.log(item);
   };
   const handleAccept = () => {
     if (data?.id) {
+      deleteTenantData(data?.id, {
+        onSuccess: () => {
+          setOpen(false);
+          setTimeout(() => {
+            setData(null);
+          }, 200);
+        },
+      });
     }
-    setOpen(false);
-    setData(null);
   };
   return (
     <TableWrapper

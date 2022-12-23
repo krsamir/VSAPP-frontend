@@ -41,3 +41,14 @@ export const usePatchTenants = () => {
   });
   return useMemo(() => ({ updateTenantData }), [updateTenantData]);
 };
+
+export const useDeleteTenants = () => {
+  const { deleteTenantThunk } = useStoreActions((store) => store.tenant);
+  const { mutate: deleteTenantData } = useMutation(deleteTenantThunk, {
+    onError(e) {
+      console.log(e);
+      toast.error(`Issue while Deleting Tenants.`);
+    },
+  });
+  return useMemo(() => ({ deleteTenantData }), [deleteTenantData]);
+};

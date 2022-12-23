@@ -23,7 +23,9 @@ export default function DeleteDialogComponent({
         open={open}
         onClose={() => {
           setOpen(false);
-          setData(null);
+          setTimeout(() => {
+            setData(null);
+          }, 500);
         }}
         aria-labelledby="delete-dialog-title"
         aria-describedby="delete-dialog-description"
@@ -38,7 +40,9 @@ export default function DeleteDialogComponent({
           <Button
             onClick={() => {
               setOpen(false);
-              setData(null);
+              setTimeout(() => {
+                setData(null);
+              }, 500);
             }}
           >
             Cancel
