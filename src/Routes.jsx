@@ -4,6 +4,7 @@ import PrivateRoute from "./Components/Authentication/PrivateRoute";
 import { ROUTES_PATH } from "./Utilities/Routes-config";
 import { createBrowserRouter, RouterProvider } from "react-router-dom";
 import { ROLES } from "./Utilities/Constant";
+import User from "./Components/admin/user-management/User";
 
 const PageNotFound = lazy(() => import("./Components/Error/page-not-found"));
 const Login = lazy(() => import("./Components/Authentication/Login"));
@@ -46,6 +47,14 @@ const router = createBrowserRouter([
       </PrivateRoute>
     ),
     children: [
+      {
+        path: ROUTES_PATH.ADMIN.USER,
+        element: (
+          <PrivateRoute hasAuthority={[ROLES.ADMIN.VALUE]}>
+            <User />
+          </PrivateRoute>
+        ),
+      },
       {
         path: "*",
         element: <PageNotFound />,
