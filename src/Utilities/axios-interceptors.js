@@ -21,6 +21,7 @@ const setupAxiosInterceptors = () => {
       toast.error("Please Login Again.", { duration: 3000 });
       if (cookies.get(TOKEN_NAME.SID)) {
         cookies.remove(TOKEN_NAME.SID, { path: "/" });
+        window.location.reload();
       }
     }
     return Promise.reject(err);
