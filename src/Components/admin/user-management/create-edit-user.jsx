@@ -15,6 +15,8 @@ import {
   Select,
   MenuItem,
   FormHelperText,
+  FormGroup,
+  FormControlLabel,
 } from "@mui/material";
 import { useForm, Controller } from "react-hook-form";
 
@@ -46,6 +48,11 @@ const StyledFormHelperText = Styled(FormHelperText)`
   color: #d32f2f !important;
 `;
 
+const ContentWrapper = Styled.div`
+  height: auto;
+  overflow-y: hidden;
+`;
+
 const FIELDS = Object.freeze({
   ID: "id",
   NAME: "name",
@@ -59,7 +66,6 @@ const FIELDS = Object.freeze({
 export default function CreateEditUserComponent() {
   const { tenants } = useStoreState((state) => state.tenant);
   useGetTenants();
-  console.log(tenants);
   const [open, setOpen] = React.useState(false);
 
   const handleClickOpen = () => {
@@ -137,127 +143,143 @@ export default function CreateEditUserComponent() {
               component={"span"}
               id="alert-dialog-slide-description"
             >
-              <Grid container spacing={2}>
-                <Grid item xs={12} sm={6} md={4}>
-                  <Controller
-                    name={FIELDS.NAME}
-                    control={control}
-                    render={({ field }) => (
-                      <TextField
-                        label={capitalize(FIELDS.NAME)}
-                        variant="filled"
-                        fullWidth
-                        autoComplete="new-password"
-                        {...field}
-                        error={errors?.[FIELDS.NAME]?.type === "required"}
-                        helperText={errors?.[FIELDS.NAME]?.message}
-                      />
-                    )}
-                    rules={{
-                      required: {
-                        value: true,
-                        message: `${capitalize(FIELDS.NAME)} cannot be empty.`,
-                      },
-                    }}
-                  />
-                </Grid>
-                <Grid item xs={12} sm={6} md={4}>
-                  <Controller
-                    name={FIELDS.USERNAME}
-                    control={control}
-                    render={({ field }) => (
-                      <TextField
-                        label={capitalize(FIELDS.USERNAME)}
-                        variant="filled"
-                        fullWidth
-                        autoComplete="new-password"
-                        {...field}
-                        error={errors?.[FIELDS.USERNAME]?.type === "required"}
-                        helperText={errors?.[FIELDS.USERNAME]?.message}
-                      />
-                    )}
-                    rules={{
-                      required: {
-                        value: true,
-                        message: `${capitalize(
-                          FIELDS.USERNAME
-                        )} cannot be empty.`,
-                      },
-                    }}
-                  />
-                </Grid>
-                <Grid item xs={12} sm={6} md={4}>
-                  <Controller
-                    name={FIELDS.MOBILE}
-                    control={control}
-                    render={({ field }) => (
-                      <TextField
-                        label={capitalize(FIELDS.MOBILE)}
-                        variant="filled"
-                        fullWidth
-                        autoComplete="new-password"
-                        {...field}
-                        error={errors?.[FIELDS.MOBILE]?.type === "required"}
-                        helperText={errors?.[FIELDS.MOBILE]?.message}
-                      />
-                    )}
-                    rules={{
-                      required: {
-                        value: true,
-                        message: `${capitalize(
-                          FIELDS.MOBILE
-                        )} Number cannot be empty.`,
-                      },
-                    }}
-                  />
-                </Grid>
-                <Grid item xs={12} sm={6} md={4}>
-                  <Controller
-                    name={FIELDS.TENANT_ID}
-                    control={control}
-                    render={({ field }) => (
-                      <FormControl fullWidth={true}>
-                        <InputLabel id="demo-simple-select-helper-label">
-                          Tenants
-                        </InputLabel>
-                        <Select
-                          fullWidth={true}
-                          labelId="demo-simple-select-helper-label"
-                          id="demo-simple-select-helper"
-                          label={`Tenants`}
+              <ContentWrapper>
+                <Grid container spacing={2}>
+                  <Grid item xs={12} sm={6} md={4}>
+                    <Controller
+                      name={FIELDS.NAME}
+                      control={control}
+                      render={({ field }) => (
+                        <TextField
+                          label={capitalize(FIELDS.NAME)}
+                          variant="filled"
+                          fullWidth
+                          autoComplete="new-password"
                           {...field}
-                          error={
-                            errors?.[FIELDS.TENANT_ID]?.type === "required"
-                          }
-                        >
-                          <MenuItem value="">None</MenuItem>
-                          <MenuItem value={10}>Ten</MenuItem>
-                          <MenuItem value={20}>Twenty</MenuItem>
-                          <MenuItem value={30}>Thirty</MenuItem>
-                        </Select>
-                        <StyledFormHelperText>
-                          {errors?.[FIELDS.TENANT_ID]?.message}
-                        </StyledFormHelperText>
-                      </FormControl>
-                    )}
-                    rules={{
-                      required: {
-                        value: true,
-                        message: `Tenant field cannot be empty.`,
-                      },
-                    }}
-                  />
+                          error={errors?.[FIELDS.NAME]?.type === "required"}
+                          helperText={errors?.[FIELDS.NAME]?.message}
+                        />
+                      )}
+                      rules={{
+                        required: {
+                          value: true,
+                          message: `${capitalize(
+                            FIELDS.NAME
+                          )} cannot be empty.`,
+                        },
+                      }}
+                    />
+                  </Grid>
+                  <Grid item xs={12} sm={6} md={4}>
+                    <Controller
+                      name={FIELDS.USERNAME}
+                      control={control}
+                      render={({ field }) => (
+                        <TextField
+                          label={capitalize(FIELDS.USERNAME)}
+                          variant="filled"
+                          fullWidth
+                          autoComplete="new-password"
+                          {...field}
+                          error={errors?.[FIELDS.USERNAME]?.type === "required"}
+                          helperText={errors?.[FIELDS.USERNAME]?.message}
+                        />
+                      )}
+                      rules={{
+                        required: {
+                          value: true,
+                          message: `${capitalize(
+                            FIELDS.USERNAME
+                          )} cannot be empty.`,
+                        },
+                      }}
+                    />
+                  </Grid>
+                  <Grid item xs={12} sm={6} md={4}>
+                    <Controller
+                      name={FIELDS.MOBILE}
+                      control={control}
+                      render={({ field }) => (
+                        <TextField
+                          label={capitalize(FIELDS.MOBILE)}
+                          variant="filled"
+                          fullWidth
+                          autoComplete="new-password"
+                          {...field}
+                          error={errors?.[FIELDS.MOBILE]?.type === "required"}
+                          helperText={errors?.[FIELDS.MOBILE]?.message}
+                        />
+                      )}
+                      rules={{
+                        required: {
+                          value: true,
+                          message: `${capitalize(
+                            FIELDS.MOBILE
+                          )} Number cannot be empty.`,
+                        },
+                      }}
+                    />
+                  </Grid>
+                  <Grid item xs={12} sm={6} md={4}>
+                    <Controller
+                      name={FIELDS.TENANT_ID}
+                      control={control}
+                      render={({ field }) => (
+                        <FormControl fullWidth={true}>
+                          <InputLabel id="demo-simple-select-helper-label">
+                            Tenants
+                          </InputLabel>
+                          <Select
+                            fullWidth={true}
+                            labelId="demo-simple-select-helper-label"
+                            id="demo-simple-select-helper"
+                            label={`Tenants`}
+                            {...field}
+                            error={
+                              errors?.[FIELDS.TENANT_ID]?.type === "required"
+                            }
+                          >
+                            <MenuItem value="">None</MenuItem>
+                            {(tenants ?? []).map(
+                              ({ id, name, status, branch }) =>
+                                status && (
+                                  <MenuItem value={id} key={id}>
+                                    {`${name} - ${branch}`}
+                                  </MenuItem>
+                                )
+                            )}
+                          </Select>
+                          <StyledFormHelperText>
+                            {errors?.[FIELDS.TENANT_ID]?.message}
+                          </StyledFormHelperText>
+                        </FormControl>
+                      )}
+                      rules={{
+                        required: {
+                          value: true,
+                          message: `Tenant field cannot be empty.`,
+                        },
+                      }}
+                    />
+                  </Grid>
+                  <Grid item xs={12} sm={6} md={4}>
+                    <Controller
+                      name={FIELDS.IS_ACTIVE}
+                      control={control}
+                      render={({ field }) => (
+                        <FormGroup>
+                          <FormControlLabel
+                            control={
+                              <Switch {...field} checked={field.value} />
+                            }
+                            label={field.value ? "Active" : "Inactive"}
+                          />
+                        </FormGroup>
+                      )}
+                    />
+                  </Grid>
                 </Grid>
-                <Grid item xs={12} sm={6} md={4}>
-                  <Controller
-                    name={FIELDS.IS_ACTIVE}
-                    control={control}
-                    render={({ field }) => (
-                      <Switch {...field} checked={field.value} />
-                    )}
-                  />
-                </Grid>
-              </Grid>
+              </ContentWrapper>
             </DialogContentText>
           </DialogContent>
           <DialogActions>
