@@ -11,6 +11,12 @@ export const superAdminLeftDrawerData = [
     ]),
     icon: <AddBusinessIcon />,
   },
+  {
+    id: 2,
+    name: "User",
+    redirect: parsedRoute([ROUTES_PATH.ADMIN.ROOT, ROUTES_PATH.ADMIN.USER]),
+    icon: <AddBusinessIcon />,
+  },
 ];
 
 export const adminLeftDrawerData = [

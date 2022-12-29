@@ -18,12 +18,15 @@ import {
   FormGroup,
   FormControlLabel,
 } from "@mui/material";
-import { useForm, Controller } from "react-hook-form";
+import AddIcon from "@mui/icons-material/Add";
 
+import { useForm, Controller } from "react-hook-form";
 import Styled from "styled-components";
 import { useStoreState } from "easy-peasy";
 import { useGetTenants } from "../../super-admin/Hooks/useTenants";
-
+import { useCreateUser } from "../Hooks/useUser";
+import { ROLES, STATUS } from "../../../Utilities/Constant";
+import { useCookies } from "../../Common/hooks/useCookies";
 const Transition = React.forwardRef(function Transition(props, ref) {
   return <Slide direction="left" ref={ref} {...props} />;
 });
@@ -66,8 +69,9 @@ const FIELDS = Object.freeze({
 export default function CreateEditUserComponent() {
   const { tenants } = useStoreState((state) => state.tenant);
   useGetTenants();
+  const { createUser } = useCreateUser();
   const [open, setOpen] = React.useState(false);
-
+  const { getCookie } = useCookies();
   const handleClickOpen = () => {
     setOpen(true);
   };
@@ -82,7 +86,7 @@ export default function CreateEditUserComponent() {
       [FIELDS.ID]: null,
       [FIELDS.NAME]: "",
       [FIELDS.USERNAME]: "",
-      [FIELDS.MOBILE]: "",
+      [FIELDS.MOBILE]: "9999999999",
       [FIELDS.IS_ACTIVE]: true,
       [FIELDS.TENANT_ID]: ``,
     }),
@@ -116,16 +120,30 @@ export default function CreateEditUserComponent() {
   const capitalize = (string) =>
     string.charAt(0).toUpperCase() + string.slice(1);
 
-  const onSubmit = useCallback((data) => {
-    console.log(data);
-  }, []);
+  const onSubmit = useCallback(
+    (data) => {
+      if (data?.id) {
+      } else {
+        delete data.id;
+        createUser(data, {
+          onSuccess(data) {
+            if (data?.data?.status === STATUS.SUCCESS) {
+              handleClose();
+            }
+          },
+        });
+      }
+    },
+    [createUser, handleClose]
+  );
   return (
     <div>
       <Button
-        variant="outlined"
+        variant="contained"
         onClick={handleClickOpen}
-        sx={{ marginTop: "20px" }}
+        sx={{ marginTop: "20px", marginLeft: "20px" }}
       >
+        <AddIcon />
         Create User
       </Button>
       <DialogComponent
@@ -206,7 +224,9 @@ export default function CreateEditUserComponent() {
                           fullWidth
                           autoComplete="new-password"
                           {...field}
-                          error={errors?.[FIELDS.MOBILE]?.type === "required"}
+                          error={[`required`, `pattern`].includes(
+                            errors?.[FIELDS.MOBILE]?.type
+                          )}
                           helperText={errors?.[FIELDS.MOBILE]?.message}
                         />
                       )}
@@ -217,51 +237,59 @@ export default function CreateEditUserComponent() {
                             FIELDS.MOBILE
                           )} Number cannot be empty.`,
                         },
-                      }}
-                    />
-                  </Grid>
-                  <Grid item xs={12} sm={6} md={4}>
-                    <Controller
-                      name={FIELDS.TENANT_ID}
-                      control={control}
-                      render={({ field }) => (
-                        <FormControl fullWidth={true}>
-                          <InputLabel id="demo-simple-select-helper-label">
-                            Tenants
-                          </InputLabel>
-                          <Select
-                            fullWidth={true}
-                            labelId="demo-simple-select-helper-label"
-                            id="demo-simple-select-helper"
-                            label={`Tenants`}
-                            {...field}
-                            error={
-                              errors?.[FIELDS.TENANT_ID]?.type === "required"
-                            }
-                          >
-                            <MenuItem value="">None</MenuItem>
-                            {(tenants ?? []).map(
-                              ({ id, name, status, branch }) =>
-                                status && (
-                                  <MenuItem value={id} key={id}>
-                                    {`${name} - ${branch}`}
-                                  </MenuItem>
-                                )
-                            )}
-                          </Select>
-                          <StyledFormHelperText>
-                            {errors?.[FIELDS.TENANT_ID]?.message}
-                          </StyledFormHelperText>
-                        </FormControl>
-                      )}
-                      rules={{
-                        required: {
-                          value: true,
-                          message: `Tenant field cannot be empty.`,
+                        pattern: {
+                          value: /^[06789]\d{9}$/,
+                          message: `${capitalize(
+                            FIELDS.MOBILE
+                          )} Number is invalid.`,
                         },
                       }}
                     />
                   </Grid>
+                  {getCookie(`role`) === ROLES.SUPER_ADMIN.VALUE && (
+                    <Grid item xs={12} sm={6} md={4}>
+                      <Controller
+                        name={FIELDS.TENANT_ID}
+                        control={control}
+                        render={({ field }) => (
+                          <FormControl fullWidth={true}>
+                            <InputLabel id="demo-simple-select-helper-label">
+                              Tenants
+                            </InputLabel>
+                            <Select
+                              fullWidth={true}
+                              labelId="demo-simple-select-helper-label"
+                              id="demo-simple-select-helper"
+                              label={`Tenants`}
+                              {...field}
+                              error={
+                                errors?.[FIELDS.TENANT_ID]?.type === "required"
+                              }
+                            >
+                              <MenuItem value="">None</MenuItem>
+                              {(tenants ?? []).map(
+                                ({ id, name, status, branch }) =>
+                                  status && (
+                                    <MenuItem value={id} key={id}>
+                                      {`${name} - ${branch}`}
+                                    </MenuItem>
+                                  )
+                              )}
+                            </Select>
+                            <StyledFormHelperText>
+                              {errors?.[FIELDS.TENANT_ID]?.message}
+                            </StyledFormHelperText>
+                          </FormControl>
+                        )}
+                        rules={{
+                          required: {
+                            value: true,
+                            message: `Tenant field cannot be empty.`,
+                          },
+                        }}
+                      />
+                    </Grid>
+                  )}
                   <Grid item xs={12} sm={6} md={4}>
                     <Controller
                       name={FIELDS.IS_ACTIVE}

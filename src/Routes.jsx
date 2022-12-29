@@ -42,7 +42,7 @@ const router = createBrowserRouter([
   {
     path: ROUTES_PATH.ADMIN.ROOT,
     element: (
-      <PrivateRoute hasAuthority={[ROLES.ADMIN.VALUE]}>
+      <PrivateRoute hasAuthority={[ROLES.ADMIN.VALUE, ROLES.SUPER_ADMIN.VALUE]}>
         <AdminHome />
       </PrivateRoute>
     ),
@@ -50,7 +50,9 @@ const router = createBrowserRouter([
       {
         path: ROUTES_PATH.ADMIN.USER,
         element: (
-          <PrivateRoute hasAuthority={[ROLES.ADMIN.VALUE]}>
+          <PrivateRoute
+            hasAuthority={[ROLES.ADMIN.VALUE, ROLES.SUPER_ADMIN.VALUE]}
+          >
             <User />
           </PrivateRoute>
         ),

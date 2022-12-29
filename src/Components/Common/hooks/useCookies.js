@@ -12,5 +12,7 @@ export const useCookies = () => {
     }, 1500);
   };
 
-  return { removeCookies };
+  const getCookie = (name) => cookie.get(name);
+
+  return { removeCookies, getCookie };
 };

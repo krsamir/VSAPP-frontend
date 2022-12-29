@@ -14,7 +14,7 @@ export const tenantModel = {
     state.tenants = payload ?? [];
   }),
   updateTenantsArray: action((state, payload) => {
-    state.tenants.push(payload);
+    state.tenants.unshift(payload);
   }),
   patchTenantsArray: action((state, payload) => {
     const index = state.tenants.findIndex((obj) => obj.id === payload?.id);
@@ -32,7 +32,7 @@ export const tenantModel = {
         const {
           data: { status, data, message },
         } = response;
-        if (status === 1) {
+        if (status === STATUS.SUCCESS) {
           addToTenantsArray(data);
         } else {
           toast.error(message);

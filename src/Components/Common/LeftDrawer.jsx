@@ -42,24 +42,25 @@ export default function LeftDrawer({
       >
         <List>
           {leftDrawerData.map(({ id, name, redirect, icon }) => (
-            <ListItem
-              key={id}
-              disablePadding
-              onClick={() => {
-                toggleDrawer(false);
-                setTimeout(() => {
-                  handleRedirect(redirect);
-                }, 500);
-              }}
-            >
-              <ListItemButton>
-                <ListItemIcon>{icon}</ListItemIcon>
-                <ListItemText primary={name} />
-              </ListItemButton>
-            </ListItem>
+            <div key={id}>
+              <ListItem
+                disablePadding
+                onClick={() => {
+                  toggleDrawer(false);
+                  setTimeout(() => {
+                    handleRedirect(redirect);
+                  }, 500);
+                }}
+              >
+                <ListItemButton>
+                  <ListItemIcon>{icon}</ListItemIcon>
+                  <ListItemText primary={name} />
+                </ListItemButton>
+              </ListItem>
+              <Divider />
+            </div>
           ))}
         </List>
-        <Divider />
       </Box>
     ),
     [handleRedirect, leftDrawerData, toggleDrawer]
