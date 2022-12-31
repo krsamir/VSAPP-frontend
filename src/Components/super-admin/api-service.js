@@ -12,3 +12,6 @@ export const deleteTenantApi = (payload) =>
 const USER_BASE_URL = "/user";
 export const fetchUserApi = () => axios.get(USER_BASE_URL);
 export const addUserApi = (payload) => axios.post(USER_BASE_URL, payload);
+export const patchUserApi = (payload) => axios.put(USER_BASE_URL, payload);
+export const deleteUserApi = (payload) =>
+  axios.delete(`${USER_BASE_URL}/${payload}`);

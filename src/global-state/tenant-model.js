@@ -56,6 +56,8 @@ export const tenantModel = {
       } else if (status === STATUS.DUPLICATE) {
         toast.error(message, { duration: 2000 });
         toast(issue, { duration: 5000 });
+      } else {
+        toast.error(message, { duration: 2000 });
       }
       return response;
     } catch (e) {

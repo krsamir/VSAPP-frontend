@@ -30,3 +30,25 @@ export const useCreateUser = () => {
   });
   return useMemo(() => ({ createUser }), [createUser]);
 };
+
+export const usePatchUser = () => {
+  const { updateUserThunk } = useStoreActions((store) => store.users);
+  const { mutate: updateUserData } = useMutation(updateUserThunk, {
+    onError(e) {
+      console.log(e);
+      toast.error(`Issue while updating Users.`);
+    },
+  });
+  return useMemo(() => ({ updateUserData }), [updateUserData]);
+};
+
+export const useDeleteUser = () => {
+  const { deleteUserThunk } = useStoreActions((store) => store.users);
+  const { mutate: deleteUserData } = useMutation(deleteUserThunk, {
+    onError(e) {
+      console.log(e);
+      toast.error(`Issue while Deleting Users.`);
+    },
+  });
+  return useMemo(() => ({ deleteUserData }), [deleteUserData]);
+};

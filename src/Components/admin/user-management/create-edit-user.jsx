@@ -1,4 +1,4 @@
-import React, { useCallback, useMemo } from "react";
+import React, { useCallback, useContext, useMemo, useEffect } from "react";
 import {
   Button,
   Dialog,
@@ -24,9 +24,10 @@ import { useForm, Controller } from "react-hook-form";
 import Styled from "styled-components";
 import { useStoreState } from "easy-peasy";
 import { useGetTenants } from "../../super-admin/Hooks/useTenants";
-import { useCreateUser } from "../Hooks/useUser";
+import { useCreateUser, usePatchUser } from "../Hooks/useUser";
 import { ROLES, STATUS } from "../../../Utilities/Constant";
 import { useCookies } from "../../Common/hooks/useCookies";
+import { AdminContext } from "../Context/admin-context";
 const Transition = React.forwardRef(function Transition(props, ref) {
   return <Slide direction="left" ref={ref} {...props} />;
 });
@@ -66,20 +67,30 @@ const FIELDS = Object.freeze({
 });
 // Note: Admin can only create users. And Super-admin can only create admin.
 
+const FIELD_DATA = {
+  shouldTouch: true,
+  shouldDirty: true,
+  shouldValidate: true,
+};
+
 export default function CreateEditUserComponent() {
   const { tenants } = useStoreState((state) => state.tenant);
   useGetTenants();
+  const {
+    providerState: { modalState, userData, setModalState, setUserData },
+  } = useContext(AdminContext);
+
   const { createUser } = useCreateUser();
-  const [open, setOpen] = React.useState(false);
+  const { updateUserData } = usePatchUser();
+  // const [open, setOpen] = React.useState(false);
   const { getCookie } = useCookies();
   const handleClickOpen = () => {
-    setOpen(true);
+    setModalState(true);
   };
-
-  const handleClose = () => {
-    setOpen(false);
-    handleFieldsReset();
-  };
+  const checkIsEdit = useMemo(
+    () => Boolean(userData?.id) || false,
+    [userData?.id]
+  );
 
   const defaultFormValues = useMemo(
     () => ({
@@ -97,11 +108,34 @@ export default function CreateEditUserComponent() {
     control,
     handleSubmit,
     formState: { errors },
-    // setValue,
+    setValue,
     reset,
   } = useForm({
     defaultValues: defaultFormValues,
   });
+
+  useEffect(() => {
+    if (checkIsEdit) {
+      const { name, mobile, id, isActive, tenantId, username } = userData;
+      setValue(FIELDS.ID, id);
+      setValue(FIELDS.NAME, name, {
+        ...FIELD_DATA,
+      });
+      setValue(FIELDS.USERNAME, username, {
+        ...FIELD_DATA,
+      });
+      setValue(FIELDS.IS_ACTIVE, isActive, {
+        ...FIELD_DATA,
+      });
+      setValue(FIELDS.TENANT_ID, tenantId, {
+        ...FIELD_DATA,
+      });
+      setValue(FIELDS.MOBILE, mobile, {
+        ...FIELD_DATA,
+      });
+    }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [userData]);
 
   const handleFieldsReset = useCallback(
     () =>
@@ -111,11 +145,11 @@ export default function CreateEditUserComponent() {
     [defaultFormValues, reset]
   );
 
-  // const FIELD_DATA = {
-  //   shouldTouch: true,
-  //   shouldDirty: true,
-  //   shouldValidate: true,
-  // };
+  const handleClose = useCallback(() => {
+    setModalState(false);
+    setUserData(null);
+    handleFieldsReset();
+  }, [handleFieldsReset, setModalState, setUserData]);
 
   const capitalize = (string) =>
     string.charAt(0).toUpperCase() + string.slice(1);
@@ -123,6 +157,16 @@ export default function CreateEditUserComponent() {
   const onSubmit = useCallback(
     (data) => {
       if (data?.id) {
+        updateUserData(
+          { data, userData },
+          {
+            onSuccess(data) {
+              if (data?.data?.status === STATUS.SUCCESS) {
+                handleClose();
+              }
+            },
+          }
+        );
       } else {
         delete data.id;
         createUser(data, {
@@ -134,7 +178,7 @@ export default function CreateEditUserComponent() {
         });
       }
     },
-    [createUser, handleClose]
+    [createUser, handleClose, updateUserData, userData]
   );
   return (
     <div>
@@ -147,7 +191,7 @@ export default function CreateEditUserComponent() {
         Create User
       </Button>
       <DialogComponent
-        open={open}
+        open={modalState}
         TransitionComponent={Transition}
         keepMounted
         onClose={handleClose}
@@ -311,8 +355,8 @@ export default function CreateEditUserComponent() {
             </DialogContentText>
           </DialogContent>
           <DialogActions>
-            <Button onClick={handleClose}>Disagree</Button>
-            <Button type="submit">Agree</Button>
+            <Button onClick={handleClose}>Cancel</Button>
+            <Button type="submit">Save</Button>
           </DialogActions>
         </form>
       </DialogComponent>

@@ -5,8 +5,8 @@ import { AdminContext } from "../Context/admin-context";
 import EditIcon from "@mui/icons-material/Edit";
 import DeleteIcon from "@mui/icons-material/Delete";
 import { useStoreState } from "easy-peasy";
-import { useGetUsers } from "../Hooks/useUser";
-// import DeleteDialogComponent from "../../Common/Delete-Dialog";
+import { useDeleteUser, useGetUsers } from "../Hooks/useUser";
+import DeleteDialogComponent from "../../Common/Delete-Dialog";
 
 const TableWrapper = Styled.div`
     margin-left: 20px;
@@ -24,11 +24,11 @@ const IconWrapper = Styled.div`
 `;
 function UserTable() {
   const { users } = useStoreState((state) => state.users);
-  // console.log(users);
   useGetUsers();
-  //   const {
-  //     providerState: { setTenantData, setModalState },
-  //   } = useContext(AdminContext);
+  const { deleteUserData } = useDeleteUser();
+  const {
+    providerState: { setUserData, setModalState },
+  } = useContext(AdminContext);
   const [, setGridApi] = useState(null);
   const [open, setOpen] = React.useState(false);
   const [data, setData] = React.useState(null);
@@ -37,8 +37,8 @@ function UserTable() {
       <IconWrapper>
         <StyledEditIcon
           onClick={() => {
-            // setTenantData(data);
-            // setModalState(true);
+            setUserData(data);
+            setModalState(true);
           }}
         ></StyledEditIcon>
       </IconWrapper>
@@ -114,14 +114,14 @@ function UserTable() {
   };
   const handleAccept = () => {
     if (data?.id) {
-      //   deleteTenantData(data?.id, {
-      //     onSuccess: () => {
-      //       setOpen(false);
-      //       setTimeout(() => {
-      //         setData(null);
-      //       }, 200);
-      //     },
-      //   });
+      deleteUserData(data?.id, {
+        onSuccess: () => {
+          setOpen(false);
+          setTimeout(() => {
+            setData(null);
+          }, 200);
+        },
+      });
     }
   };
   return (
@@ -139,14 +139,14 @@ function UserTable() {
         getRowId={getRowNodeId}
         paginationPageSize={10}
       ></AgGridReact>
-      {/* <DeleteDialogComponent
+      <DeleteDialogComponent
         setOpen={setOpen}
         open={open}
         handleAccept={handleAccept}
-        content={`Are you sure to delete ${data?.name}?`}
-        title={`Delete Tenant`}
+        content={`Are you sure to delete user ${data?.name}?`}
+        title={`Delete User`}
         setData={setData}
-      ></DeleteDialogComponent> */}
+      ></DeleteDialogComponent>
     </TableWrapper>
   );
 }
