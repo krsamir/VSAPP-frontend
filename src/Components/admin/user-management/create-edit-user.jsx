@@ -188,7 +188,9 @@ export default function CreateEditUserComponent() {
         sx={{ marginTop: "20px", marginLeft: "20px" }}
       >
         <AddIcon />
-        Create User
+        {getCookie(`role`) === ROLES.SUPER_ADMIN.VALUE
+          ? `Create Admin`
+          : `Create User`}
       </Button>
       <DialogComponent
         open={modalState}
@@ -199,7 +201,11 @@ export default function CreateEditUserComponent() {
         fullScreen={true}
       >
         <form onSubmit={handleSubmit(onSubmit)}>
-          <DialogTitle>Create User</DialogTitle>
+          <DialogTitle>
+            {getCookie(`role`) === ROLES.SUPER_ADMIN.VALUE
+              ? `Create Admin`
+              : `Create User`}
+          </DialogTitle>
           <DialogContent>
             <DialogContentText
               component={"span"}
