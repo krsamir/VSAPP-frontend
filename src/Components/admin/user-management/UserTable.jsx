@@ -9,6 +9,8 @@ import { useStoreState } from "easy-peasy";
 import { useDeleteUser, useGetUsers } from "../Hooks/useUser";
 import DeleteDialogComponent from "../../Common/Delete-Dialog";
 import { useGenerateToken } from "../../Authentication/Hooks/useAuthenticationHook";
+import { ROLES } from "../../../Utilities/Constant";
+import { useCookies } from "../../Common/hooks/useCookies";
 
 const TableWrapper = Styled.div`
     margin-left: 20px;
@@ -30,6 +32,7 @@ const IconWrapper = Styled.div`
 function UserTable() {
   const { users } = useStoreState((state) => state.users);
   useGetUsers();
+  const { getCookie } = useCookies();
   const { deleteUserData } = useDeleteUser();
   const { generateToken } = useGenerateToken();
   const {
@@ -90,6 +93,11 @@ function UserTable() {
     { headerName: "Token", field: "token" },
     { headerName: "Valid Till", field: "validTill", width: 200 },
     { headerName: "Created By", field: "createdBy" },
+    {
+      headerName: "Role",
+      field: "role.role",
+      hide: getCookie(`role`) !== ROLES.SUPER_ADMIN.VALUE,
+    },
     {
       headerName: "Token & Validity",
       field: "edit",
