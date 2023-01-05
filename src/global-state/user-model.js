@@ -1,4 +1,4 @@
-import { action, debug, thunk } from "easy-peasy";
+import { action, thunk } from "easy-peasy";
 import { toast } from "react-hot-toast";
 import {
   fetchUserApi,
@@ -50,11 +50,9 @@ export const userModel = {
     const index = state.users.findIndex((obj) => obj.id === payload?.id);
     state.users[index] = payload;
   }),
-  passwordUpdate: action((state, { username, token, validTill }) => {
-    const index = state.users.findIndex((obj) => obj.username === username);
-    console.log(index);
+  tokenUpdate: action((state, { id, token, validTill }) => {
+    const index = state.users.findIndex((obj) => obj.id === id);
     const value = state.users[index];
-    console.log(debug(state.users));
     state.users[index] = { ...value, token, validTill };
   }),
   deleteTenantFromArray: action((state, payload) => {
