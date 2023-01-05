@@ -9,6 +9,8 @@ import {
 import { loginApi } from "../Authentication.service";
 import { ROLES } from "../../../Utilities/Constant";
 import { ROUTES_PATH, parsedRoute } from "../../../Utilities/Routes-config";
+import { useStoreActions } from "easy-peasy";
+import { useMemo } from "react";
 
 export const useLogin = () => {
   const navigate = useNavigate();
@@ -54,4 +56,37 @@ export const useLogin = () => {
     },
   });
   return { handleLogin, isLoading };
+};
+
+export const useGenerateToken = () => {
+  const { generateTokenThunk } = useStoreActions((store) => store.users);
+  const { mutate: generateToken } = useMutation(generateTokenThunk, {
+    onError(e) {
+      console.log(e);
+      toast.error(`Issue while generating token.`);
+    },
+  });
+  return useMemo(
+    () => ({
+      generateToken,
+    }),
+    [generateToken]
+  );
+};
+
+export const useChangePassword = () => {
+  const { changePasswordThunk } = useStoreActions((store) => store.users);
+  const { mutate: changePassword } = useMutation(changePasswordThunk, {
+    onError(error) {
+      console.log(error);
+      toast.error(`Unable to reset password./पासवर्ड रीसेट करने में असमर्थ।`);
+    },
+  });
+
+  return useMemo(
+    () => ({
+      changePassword,
+    }),
+    [changePassword]
+  );
 };

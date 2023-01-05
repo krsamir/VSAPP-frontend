@@ -1,4 +1,4 @@
-import { action, thunk } from "easy-peasy";
+import { action, debug, thunk } from "easy-peasy";
 import { toast } from "react-hot-toast";
 import {
   fetchUserApi,
@@ -6,6 +6,10 @@ import {
   patchUserApi,
   deleteUserApi,
 } from "../Components/super-admin/api-service";
+import {
+  resetToken,
+  validityApi,
+} from "../Components/Authentication/Authentication.service";
 import { STATUS } from "../Utilities/Constant";
 
 export const userModel = {
@@ -15,6 +19,12 @@ export const userModel = {
   }),
   adToUserArray: action((state, payload) => {
     state.users.unshift(payload);
+  }),
+  deleteUserFromArray: action((state, payload) => {
+    const index = state.users.findIndex((obj) => obj.id === payload);
+    if (index > -1) {
+      state.users?.splice(index, 1);
+    }
   }),
 
   fetchUserListThunk: thunk(async ({ loadUserArray }, _, { fail }) => {
@@ -39,6 +49,13 @@ export const userModel = {
   patchUserArray: action((state, payload) => {
     const index = state.users.findIndex((obj) => obj.id === payload?.id);
     state.users[index] = payload;
+  }),
+  passwordUpdate: action((state, { username, token, validTill }) => {
+    const index = state.users.findIndex((obj) => obj.username === username);
+    console.log(index);
+    const value = state.users[index];
+    console.log(debug(state.users));
+    state.users[index] = { ...value, token, validTill };
   }),
   deleteTenantFromArray: action((state, payload) => {
     const index = state.users.findIndex((obj) => obj.id === payload);
@@ -116,24 +133,58 @@ export const userModel = {
       }
     }
   ),
-  deleteUserThunk: thunk(
-    async ({ deleteTenantFromArray }, payload, { fail }) => {
-      try {
-        const response = await deleteUserApi(payload);
-        const {
-          data: { status, message },
-        } = response;
-        if (status === STATUS.SUCCESS) {
-          // deleteTenantFromArray(payload);
-          toast.success(message);
-        } else {
-          toast.error(message, { duration: 2000 });
-        }
-        return response;
-      } catch (e) {
-        fail(e);
-        throw new Error(e);
+  deleteUserThunk: thunk(async ({ deleteUserFromArray }, payload, { fail }) => {
+    try {
+      const response = await deleteUserApi(payload);
+      const {
+        data: { status, message },
+      } = response;
+      if (status === STATUS.SUCCESS) {
+        deleteUserFromArray(payload);
+        toast.success(message);
+      } else {
+        toast.error(message, { duration: 2000 });
       }
+      return response;
+    } catch (e) {
+      fail(e);
+      throw new Error(e);
     }
-  ),
+  }),
+  generateTokenThunk: thunk(async ({ tokenUpdate }, payload, { fail }) => {
+    try {
+      const response = await resetToken(payload);
+      const {
+        data: { status, message, token, validTill },
+      } = response;
+      if (status === STATUS.SUCCESS) {
+        tokenUpdate({ id: payload.id, token, validTill });
+        toast.success(message);
+      } else {
+        toast.error(message, { duration: 2000 });
+      }
+      return response;
+    } catch (e) {
+      fail(e);
+      throw new Error(e);
+    }
+  }),
+  changePasswordThunk: thunk(async (_, payload, { fail }) => {
+    try {
+      const response = await validityApi(payload);
+      console.log(payload);
+      const {
+        data: { status, message },
+      } = response;
+      if (status === STATUS.SUCCESS) {
+        toast.success(message);
+      } else {
+        toast.error(message, { duration: 5000 });
+      }
+      return response;
+    } catch (e) {
+      fail(e);
+      throw new Error(e);
+    }
+  }),
 };

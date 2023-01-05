@@ -2,7 +2,8 @@ import React from "react";
 import { useForm } from "react-hook-form";
 import "./Login.css";
 import avtar from "../../Assets/avatar.png";
-import { useLogin } from "./Hooks/useLoginHook";
+import { useLogin } from "./Hooks/useAuthenticationHook";
+import ChangePassword from "./PasswordChange";
 function Login() {
   const FIELD_NAMES = Object.freeze({
     USERNAME: "username",
@@ -71,6 +72,7 @@ function Login() {
             {isLoading ? "Please Wait..." : "Login"}
           </button>
         </form>
+        <ChangePassword />
       </div>
     </div>
   );

@@ -4,9 +4,11 @@ import Styled from "styled-components";
 import { AdminContext } from "../Context/admin-context";
 import EditIcon from "@mui/icons-material/Edit";
 import DeleteIcon from "@mui/icons-material/Delete";
+import CachedIcon from "@mui/icons-material/Cached";
 import { useStoreState } from "easy-peasy";
 import { useDeleteUser, useGetUsers } from "../Hooks/useUser";
 import DeleteDialogComponent from "../../Common/Delete-Dialog";
+import { useGenerateToken } from "../../Authentication/Hooks/useAuthenticationHook";
 
 const TableWrapper = Styled.div`
     margin-left: 20px;
@@ -16,7 +18,10 @@ const StyledEditIcon = Styled(EditIcon)`
   cursor: pointer;
 `;
 const StyledDeleteIcon = Styled(DeleteIcon)`
-  cursor:pointer;
+  cursor: pointer;
+`;
+const StyledRegenerateIcon = Styled(CachedIcon)`
+  cursor: pointer;
 `;
 const IconWrapper = Styled.div`
   display:flex;
@@ -26,12 +31,26 @@ function UserTable() {
   const { users } = useStoreState((state) => state.users);
   useGetUsers();
   const { deleteUserData } = useDeleteUser();
+  const { generateToken } = useGenerateToken();
   const {
     providerState: { setUserData, setModalState },
   } = useContext(AdminContext);
   const [, setGridApi] = useState(null);
   const [open, setOpen] = React.useState(false);
   const [data, setData] = React.useState(null);
+
+  const tokenCellRenderer = ({ data: { id, username } }) => {
+    return (
+      <IconWrapper>
+        <StyledRegenerateIcon
+          onClick={() => {
+            generateToken({ id, username });
+          }}
+        ></StyledRegenerateIcon>
+      </IconWrapper>
+    );
+  };
+
   const editCellRenderer = ({ data }) => {
     return (
       <IconWrapper>
@@ -69,8 +88,16 @@ function UserTable() {
     },
     { headerName: "Tenant", field: "tenant.name" },
     { headerName: "Token", field: "token" },
-    { headerName: "Valid Till", field: "validTill" },
+    { headerName: "Valid Till", field: "validTill", width: 200 },
     { headerName: "Created By", field: "createdBy" },
+    {
+      headerName: "Token & Validity",
+      field: "edit",
+      cellRenderer: tokenCellRenderer,
+      resizable: false,
+      sortable: false,
+      filter: false,
+    },
     {
       headerName: "Edit",
       field: "edit",

@@ -38,7 +38,7 @@
   left: 50%;
   translate: -50% -50%;
   width: 90%;
-  padding: 70px 30px 44px;
+  padding: 70px 30px 20px;
   border-radius: 22px;
   background: #161616;
   text-align: center;
@@ -148,4 +148,9 @@
 .error-text {
   font-size: 14px;
   color: red;
+}
+
+.forgotPassword {
+  margin-top: 5px;
+  cursor: pointer;
 }
