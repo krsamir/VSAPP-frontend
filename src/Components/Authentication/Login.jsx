@@ -16,7 +16,7 @@ function Login() {
     formState: { errors },
   } = useForm({
     defaultValues: {
-      [FIELD_NAMES.USERNAME]: "admin",
+      [FIELD_NAMES.USERNAME]: "",
       [FIELD_NAMES.PASSWORD]: "admin",
     },
   });
