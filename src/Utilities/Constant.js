@@ -41,3 +41,8 @@ export const RESPONSE_STATUS = Object.freeze({
   NOT_FOUND_404: 404,
   INTERNAL_SERVER_ERROR_500: 500,
 });
+
+export const ATTENDANCE_STATUS = Object.freeze({
+  PENDING: "pending",
+  DONE: "done",
+});

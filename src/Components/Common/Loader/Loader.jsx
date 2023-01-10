@@ -1,7 +1,7 @@
 import React from "react";
 import "./Loader.css";
 
-function LoaderIcon({ showLoader = true }) {
+function Loader({ showLoader = true }) {
   return (
     <div className="ContainerHeight">
       {showLoader && <div className="lds-hourglass"></div>}
@@ -9,4 +9,4 @@ function LoaderIcon({ showLoader = true }) {
   );
 }
 
-export default LoaderIcon;
+export default Loader;
