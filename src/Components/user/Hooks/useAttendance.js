@@ -1,19 +1,29 @@
 import { useMemo } from "react";
-import { useMutation, useQuery } from "react-query";
+import { useMutation } from "react-query";
 import { toast } from "react-hot-toast";
-import { QUERY_KEYS } from "../../../Utilities/query-keys";
+// import { QUERY_KEYS } from "../../../Utilities/query-keys";
 import {
   markAttendaceAPI,
   getTodaysAttendanceAPI,
 } from "../Services/Attendance.service";
-import { ATTENDANCE_STATUS, STATUS } from "../../../Utilities/Constant";
+import { STATUS } from "../../../Utilities/Constant";
 
-// export const useMarkAttendance = () => {
-//   const {} = useMutation(markAttendaceAPI, {
-//     enabled: false,
-//   });
-//   return;
-// };
+export const useMarkAttendance = () => {
+  const { mutate: markAttendance, data } = useMutation(markAttendaceAPI, {
+    onSuccess(data) {
+      if (data?.data.status === STATUS.SUCCESS) {
+        toast.success(data?.data.message);
+      } else {
+        toast.error(data?.data.message);
+      }
+    },
+    onError(e) {
+      console.log(e);
+      toast.error(`Issue while marking attendance.`);
+    },
+  });
+  return useMemo(() => ({ markAttendance, data }), [data, markAttendance]);
+};
 
 export const useGetTodaysAttendance = () => {
   const {
