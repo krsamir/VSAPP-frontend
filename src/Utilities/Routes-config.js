@@ -7,6 +7,7 @@ export const ROUTES_PATH = Object.freeze({
   ADMIN: {
     ROOT: "admin",
     USER: "user",
+    ATTENDANCE: "attendance",
   },
   USER: {
     ROOT: "/",

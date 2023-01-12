@@ -26,4 +26,13 @@ export const adminLeftDrawerData = [
     redirect: parsedRoute([ROUTES_PATH.ADMIN.ROOT, ROUTES_PATH.ADMIN.USER]),
     icon: <AddBusinessIcon />,
   },
+  {
+    id: 2,
+    name: `Attendance`,
+    redirect: parsedRoute([
+      ROUTES_PATH.ADMIN.ROOT,
+      ROUTES_PATH.ADMIN.ATTENDANCE,
+    ]),
+    icon: <AddBusinessIcon />,
+  },
 ];
