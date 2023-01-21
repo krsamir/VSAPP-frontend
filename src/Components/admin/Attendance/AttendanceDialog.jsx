@@ -186,7 +186,7 @@ export default function AttendanceDialog({
                   <LabelData>{userDetail?.name}</LabelData>
                 </LabelContainer>
                 <LabelContainer>
-                  <Name>Total Applied (NA) :</Name>
+                  <Name>Total Applied :</Name>
                   <LabelData>{attendance.length}</LabelData>
                 </LabelContainer>
                 <LabelContainer>
