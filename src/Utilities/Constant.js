@@ -46,3 +46,7 @@ export const ATTENDANCE_STATUS = Object.freeze({
   PENDING: "pending",
   DONE: "done",
 });
+
+export const VIEW_DATE_FORMAT = `DD-MM-YYYY`;
+export const VIEW_TIME_FORMAT = `DD-MMM-YYYY HH:mm:ss`;
+export const ADD_TIME_FORMAT = `YYYY-MM-DD HH:mm:ss`;

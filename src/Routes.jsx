@@ -12,8 +12,8 @@ const SuperAdminHome = lazy(() => import("./Components/super-admin/Home"));
 const AdminHome = lazy(() => import("./Components/admin/Home"));
 const UserHome = lazy(() => import("./Components/user/Home"));
 const Tenants = lazy(() => import("./Components/super-admin/Tenants/Tenants"));
-const AttendanceList = lazy(() =>
-  import("./Components/admin/Attendance/AttendanceList")
+const AttendanceMain = lazy(() =>
+  import("./Components/admin/Attendance/AttendanceMain")
 );
 const router = createBrowserRouter([
   {
@@ -64,7 +64,7 @@ const router = createBrowserRouter([
         path: ROUTES_PATH.ADMIN.ATTENDANCE,
         element: (
           <PrivateRoute hasAuthority={[ROLES.ADMIN.VALUE]}>
-            <AttendanceList />
+            <AttendanceMain />
           </PrivateRoute>
         ),
       },

@@ -58,10 +58,13 @@ export const useGetTodaysAttendance = () => {
   );
 };
 
-export const useGetUserAttendanceList = () => {
+export const useGetUserAttendanceList = (
+  month = moment().month() + 1,
+  year = moment().year()
+) => {
   const { data, isLoading } = useQuery(
-    QUERY_KEYS.GET_ATTENDANCE,
-    getUserAttendanceList,
+    [QUERY_KEYS.GET_ATTENDANCE, month, year],
+    () => getUserAttendanceList({ month, year }),
     {
       onError(e) {
         console.log(e);
@@ -76,12 +79,14 @@ export const useGetUserAttendanceList = () => {
   );
 };
 
-export const useCalendar = () => {
-  // const testDate = `2023-02-01`;
-  const date = moment();
+export const useCalendar = (
+  month = moment().month() + 1,
+  year = moment().year()
+) => {
+  const selectedDate = `${year}-${month}-01`;
+  const date = moment(selectedDate);
   const currentMonth = date.clone().month() + 1;
   const currentYear = date.clone().year();
-  // const startOfThisMonth = date.clone().startOf(`month`).date();
   const endOfThisMonth = date.clone().endOf(`month`).date();
   const momentDates = Array.from({ length: endOfThisMonth }, (_, i) =>
     moment(
@@ -90,13 +95,5 @@ export const useCalendar = () => {
       }`
     )
   );
-  // console.log({
-  //   currentMonth,
-  //   currentYear,
-  //   startOfThisMonth,
-  //   endOfThisMonth,
-  //   momentDates,
-  // });
-
   return useMemo(() => ({ momentDates }), [momentDates]);
 };

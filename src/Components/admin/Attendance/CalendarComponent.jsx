@@ -1,30 +1,14 @@
 import React, { useCallback, useState } from "react";
 import Styled from "styled-components";
 import moment from "moment";
-import { useCalendar } from "../../user/Hooks/useAttendance";
 import AttendanceDialog from "./AttendanceDialog";
+import { Table } from "../Constant";
 
 const NO_OF_COLS = 3;
 const Container = Styled.div`
+padding: 0 20px;
 `;
 
-const Table = Styled.table`
-&.table__main {
-  font-family: arial, sans-serif;
-  border-collapse: collapse;
-  margin-top: 90px;
-  width: 100%;
-}
-
-td, th {
-  border: 1px solid #dddddd;
-  text-align: center;
-}
-
-tr:nth-child(even) {
-  /* background-color: #dddddd; */
-}
-`;
 const SingleCell = Styled.div`
     padding: 10px;
 `;
@@ -35,41 +19,19 @@ const Present = Styled(SingleCell)`
     background-color: #5bd35b;
 `;
 
-function CalendarComponent({ data }) {
-  const { momentDates } = useCalendar();
-
+function CalendarComponent({ data, momentDates }) {
   const [open, setOpen] = useState(false);
   const [calendarData, setCalendarData] = useState({});
 
-  const buildAttendanceBox = useCallback(
-    (singleDate, attendance, name) =>
-      attendance.map((value, index) => {
+  const buildAttendanceGrid = useCallback(
+    (singleDate, userData) =>
+      (userData ?? []).attendance.map((value, index) => {
         // eslint-disable-next-line no-unused-vars
         const { markedOn, ApprovedOn, approvedBy, status, userId } = value;
         if (singleDate.isSame(markedOn) && status === true) {
-          return (
-            <Present
-              key={index}
-              onClick={() => {
-                setOpen(true);
-                setCalendarData({ ...value, name });
-              }}
-            >
-              P
-            </Present>
-          );
+          return <Present key={index}>P</Present>;
         } else if (singleDate.isSame(markedOn) && status === false) {
-          return (
-            <NotApplicable
-              key={index}
-              onClick={() => {
-                setOpen(true);
-                setCalendarData({ ...value, name });
-              }}
-            >
-              NA
-            </NotApplicable>
-          );
+          return <NotApplicable key={index}>NA</NotApplicable>;
         } else {
           return <div key={index}></div>;
         }
@@ -78,7 +40,10 @@ function CalendarComponent({ data }) {
   );
 
   //   console.log(data);
-
+  const handleDataInput = (attendanceData) => {
+    setOpen(true);
+    setCalendarData(attendanceData);
+  };
   return (
     <Container>
       <Table className="table__main">
@@ -97,18 +62,20 @@ function CalendarComponent({ data }) {
         </thead>
         {data.length ? (
           <tbody>
-            {data.map(({ id, name, username, attendance }) => {
+            {data.map((attendanceData) => {
+              const { id, name, username, attendance } = attendanceData;
               return (
-                <tr key={id}>
+                <tr
+                  key={id}
+                  onClick={() => handleDataInput(attendanceData)}
+                  style={{ cursor: "pointer" }}
+                >
                   <td>{name}</td>
-                  {momentDates.map((v, i) => {
-                    // console.log(attendance);
-                    return (
-                      <React.Fragment key={i}>
-                        <td>{buildAttendanceBox(v, attendance, name)}</td>
-                      </React.Fragment>
-                    );
-                  })}
+                  {momentDates.map((v, i) => (
+                    <React.Fragment key={i}>
+                      <td>{buildAttendanceGrid(v, attendanceData)}</td>
+                    </React.Fragment>
+                  ))}
                   <td>
                     {(attendance ?? []).filter(({ status }) => status).length}
                   </td>
@@ -129,8 +96,10 @@ function CalendarComponent({ data }) {
       <AttendanceDialog
         setOpen={setOpen}
         open={open}
-        data={calendarData}
+        attendance={calendarData.attendance ?? []}
+        userDetail={calendarData}
         setCalendarData={setCalendarData}
+        momentDates={momentDates}
       />
     </Container>
   );
