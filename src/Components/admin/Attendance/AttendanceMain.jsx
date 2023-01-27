@@ -7,14 +7,15 @@ import {
 import AttendanceTimeline from "./AttendanceTimeline";
 import CalendarComponent from "./CalendarComponent";
 import { MONTHS, YEAR_LIST } from "../Constant";
-
+import { useStoreState } from "easy-peasy";
 function AttendanceList() {
   const [month, setMonth] = useState(moment().month() + 1);
   const [year, setYear] = useState(moment().year());
   const handleMonth = (e) => setMonth(e.target.value);
   const handleYear = (e) => setYear(e.target.value);
 
-  const { data } = useGetUserAttendanceList(month, year);
+  useGetUserAttendanceList(month, year);
+  const { attendance: data } = useStoreState((state) => state.attendance);
   const { momentDates } = useCalendar(month, year);
   return (
     <div>

@@ -1,11 +1,11 @@
 import { useMemo } from "react";
 import { useMutation, useQuery } from "react-query";
+import { useStoreActions } from "easy-peasy";
 import { toast } from "react-hot-toast";
 import { QUERY_KEYS } from "../../../Utilities/query-keys";
 import {
   markAttendaceAPI,
   getTodaysAttendanceAPI,
-  getUserAttendanceList,
 } from "../Services/Attendance.service";
 import { STATUS } from "../../../Utilities/Constant";
 import moment from "moment";
@@ -62,9 +62,10 @@ export const useGetUserAttendanceList = (
   month = moment().month() + 1,
   year = moment().year()
 ) => {
+  const { fetchAttendanceList } = useStoreActions((store) => store.attendance);
   const { data, isLoading } = useQuery(
     [QUERY_KEYS.GET_ATTENDANCE, month, year],
-    () => getUserAttendanceList({ month, year }),
+    () => fetchAttendanceList({ month, year }),
     {
       onError(e) {
         console.log(e);
