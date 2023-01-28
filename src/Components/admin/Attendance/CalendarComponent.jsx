@@ -52,7 +52,7 @@ function CalendarComponent({ data, momentDates }) {
             <th>Name</th>
             {momentDates.map((v, i) => (
               <React.Fragment key={i}>
-                <th>{moment(v).date()}</th>
+                <th>{moment(v.moment).date()}</th>
               </React.Fragment>
             ))}
             <th>Present</th>
@@ -73,7 +73,7 @@ function CalendarComponent({ data, momentDates }) {
                   <td>{name}</td>
                   {momentDates.map((v, i) => (
                     <React.Fragment key={i}>
-                      <td>{buildAttendanceGrid(v, attendanceData)}</td>
+                      <td>{buildAttendanceGrid(v.moment, attendanceData)}</td>
                     </React.Fragment>
                   ))}
                   <td>

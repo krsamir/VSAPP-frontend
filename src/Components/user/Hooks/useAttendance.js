@@ -89,12 +89,13 @@ export const useCalendar = (
   const currentMonth = date.clone().month() + 1;
   const currentYear = date.clone().year();
   const endOfThisMonth = date.clone().endOf(`month`).date();
-  const momentDates = Array.from({ length: endOfThisMonth }, (_, i) =>
-    moment(
+  const momentDates = Array.from({ length: endOfThisMonth }, (_, i) => ({
+    moment: moment(
       `${currentYear}-${currentMonth > 9 ? currentMonth : "0" + currentMonth}-${
         i > 8 ? i + 1 : "0" + (i + 1)
       }`
-    )
-  );
+    ),
+    position: i,
+  }));
   return useMemo(() => ({ momentDates }), [momentDates]);
 };

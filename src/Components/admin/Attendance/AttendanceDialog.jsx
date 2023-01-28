@@ -1,18 +1,24 @@
-import React, { useMemo, useState } from "react";
+import React, { useMemo, useState, useCallback } from "react";
 import CloseIcon from "@mui/icons-material/Close";
 import {
   AppBar,
   Button,
+  Checkbox,
   Dialog,
   IconButton,
   Slide,
   Toolbar,
+  Tooltip,
   Typography,
 } from "@mui/material";
 import Styled from "styled-components";
 import { Table } from "../Constant";
 import moment from "moment";
 import { VIEW_DATE_FORMAT } from "../../../Utilities/Constant";
+import CheckIcon from "@mui/icons-material/Check";
+import AddIcon from "@mui/icons-material/Add";
+import DoneAllIcon from "@mui/icons-material/DoneAll";
+import DownloadIcon from "@mui/icons-material/Download";
 
 const Transition = React.forwardRef(function Transition(props, ref) {
   return <Slide direction="left" ref={ref} {...props} />;
@@ -30,7 +36,7 @@ const STATUS = Object.freeze({
 const ContentBox = Styled.div`
   display: flex;
   align-items: center;
-  margin-bottom: 20px;
+  margin-bottom: 5px;
   border-radius: 10px;
 `;
 
@@ -54,13 +60,13 @@ const LabelContainer = Styled.div`
 const LabelData = Styled.span`
   margin-left: 15px;
 `;
-const ApproveButton = Styled.button`
-    padding: 6px 15px;
-    border-radius: 6px;
-    outline: none;
-    border: 1px solid #ededed;
-    background-color: #a7f1a7;
-    cursor: pointer;
+
+const OptionMenu = Styled.div`
+    display: flex;
+    flex-direction: row;
+    align-items: center;
+    justify-content: space-evenly;
+    margin: 20px 0px;
     `;
 export default function AttendanceDialog({
   open = false,
@@ -70,19 +76,19 @@ export default function AttendanceDialog({
   setCalendarData,
   userDetail = {},
 }) {
-  const [selectedRows, setSelectedRows] = useState([]);
-  const [attendanceData, setAttendanceData] = useState([]);
-  const notApprovedAttendance = useMemo(
-    () => attendance.filter((val) => !val.status),
-    [attendance]
-  );
+  const [approvalRows, setApprovalRows] = useState([]);
+  const [regularizationRows, setRegularizationRows] = useState([]);
+  const [approvalData, setApprovalData] = useState([]);
+  const [regularizationData, setRegularizationData] = useState([]);
 
-  const handleClose = () => {
+  const handleClose = useCallback(() => {
     setCalendarData({});
     setOpen(false);
-    setSelectedRows([]);
-    setAttendanceData([]);
-  };
+    setApprovalRows([]);
+    setApprovalData([]);
+    setRegularizationRows([]);
+    setRegularizationData([]);
+  }, [setCalendarData, setOpen]);
 
   const calendarGrid = useMemo(() => {
     const emptyObj = {
@@ -94,62 +100,115 @@ export default function AttendanceDialog({
     };
     return momentDates.map((date) => {
       const index = (attendance ?? []).findIndex(({ markedOn }) =>
-        moment(markedOn).isSame(date)
+        moment(markedOn).isSame(date.moment)
       );
       if (index > -1) {
         const vals = attendance[index];
         return {
           ...vals,
-          date,
+          date: date.moment,
           isApproved: vals.status ? STATUS.PRESENT : STATUS.NA,
+          position: date.position,
         };
       } else {
         return {
-          date,
+          date: date.moment,
           ...emptyObj,
+          position: date.position,
         };
       }
     });
   }, [attendance, momentDates]);
 
-  const handleSelect = (event, selectVal) => {
-    const {
-      target: { name, checked },
-    } = event;
-    if (name === "all") {
-      // Check and uncheck all the rows
-      if (checked) {
-        setSelectedRows(notApprovedAttendance.map((elem) => elem.id));
-        setAttendanceData(notApprovedAttendance);
-      } else {
-        setSelectedRows([]);
-        setAttendanceData([]);
-      }
-    } else {
-      const { id } = selectVal;
-      if (selectedRows.includes(id)) {
-        // uncheck the row
-        setSelectedRows(selectedRows.filter((row) => row !== id));
-        setAttendanceData(attendanceData.filter((value) => value.id !== id));
-      } else {
-        // check the row
-        setSelectedRows((prev) => [...prev, id]);
-        setAttendanceData((prev) => [
-          ...prev,
-          ...attendance.filter((val) => val.id === id),
-        ]);
-      }
-    }
-  };
+  const notApprovedAttendance = useMemo(
+    () => calendarGrid.filter((val) => val.status !== null && !val.status),
+    [calendarGrid]
+  );
+  const emptyDates = useMemo(
+    () => calendarGrid.filter((val) => val.id === null),
+    [calendarGrid]
+  );
 
-  const handleApproval = (value) => {
+  const handleCheckboxSelection = useCallback(
+    (selectVal) => {
+      const { id, position } = selectVal;
+      if (id) {
+        if (approvalRows.includes(position)) {
+          // uncheck the row
+          setApprovalRows(approvalRows.filter((row) => row !== position));
+          setApprovalData(
+            approvalData.filter((value) => value.position !== position)
+          );
+        } else {
+          // check the row
+          setApprovalRows((prev) => [...prev, position]);
+          setApprovalData((prev) => [
+            ...prev,
+            ...calendarGrid.filter((val) => val.position === position),
+          ]);
+        }
+      } else {
+        if (regularizationRows.includes(position)) {
+          // uncheck the row
+          setRegularizationRows(
+            regularizationRows.filter((row) => row !== position)
+          );
+          setRegularizationData(
+            regularizationData.filter((value) => value.position !== position)
+          );
+        } else {
+          // check the row
+          setRegularizationRows((prev) => [...prev, position]);
+          setRegularizationData((prev) => [
+            ...prev,
+            ...calendarGrid.filter((val) => val.position === position),
+          ]);
+        }
+      }
+    },
+    [
+      approvalData,
+      approvalRows,
+      calendarGrid,
+      regularizationData,
+      regularizationRows,
+    ]
+  );
+
+  const selectAllforApproval = useCallback(() => {
+    if (approvalRows.length <= 0) {
+      setApprovalRows(notApprovedAttendance.map((elem) => elem.position));
+      setApprovalData(notApprovedAttendance);
+    } else {
+      setApprovalRows([]);
+      setApprovalData([]);
+    }
+  }, [approvalRows, notApprovedAttendance]);
+
+  const selectAllForRegularization = useCallback(() => {
+    if (regularizationRows.length <= 0) {
+      setRegularizationRows(emptyDates.map((elem) => elem.position));
+      setRegularizationData(emptyDates);
+    } else {
+      setRegularizationRows([]);
+      setRegularizationData([]);
+    }
+  }, [emptyDates, regularizationRows]);
+
+  const handleApproval = useCallback((value) => {
     console.log(value);
     // console.log(value);
-  };
+  }, []);
+  const handleRegularization = useCallback((value) => {
+    console.log(value);
+  }, []);
+  const handleBulkApprove = useCallback(() => {
+    console.log(approvalData);
+  }, [approvalData]);
 
-  const handleBulkApprove = () => {
-    console.log(attendanceData);
-  };
+  const handleBulkRegularize = useCallback(() => {
+    console.log(regularizationData);
+  }, [regularizationData]);
 
   return (
     <div>
@@ -208,35 +267,53 @@ export default function AttendanceDialog({
                     {calendarGrid.length - attendance.length}
                   </LabelData>
                 </LabelContainer>
-                <Button
-                  variant="contained"
-                  disabled={!selectedRows.length}
-                  onClick={handleBulkApprove}
-                  sx={{ marginTop: "10px" }}
-                >
-                  Bulk Approve{" "}
-                  {selectedRows.length > 0 && `(${selectedRows.length})`}
-                </Button>
               </div>
             </ContentBox>
+            <OptionMenu>
+              <Button variant="contained" onClick={selectAllforApproval}>
+                <CheckIcon />
+                Select All (Approval)
+              </Button>
+              <Button variant="contained" onClick={selectAllForRegularization}>
+                <CheckIcon />
+                Select All (Regularization)
+              </Button>
+              <Button
+                variant="contained"
+                disabled={approvalRows.length < 2}
+                onClick={handleBulkApprove}
+              >
+                Bulk Approve
+                {approvalRows.length > 0 && `(${approvalRows.length})`}
+              </Button>
+              <br />
+              <Button
+                variant="contained"
+                disabled={regularizationRows.length < 2}
+                onClick={handleBulkRegularize}
+              >
+                Bulk Regularize
+                {regularizationRows.length > 0 &&
+                  `(${regularizationRows.length})`}
+              </Button>
+              <Tooltip
+                title="Download Excel File under progress"
+                placement="top"
+              >
+                <Button variant="contained" disabled>
+                  <DownloadIcon />
+                </Button>
+              </Tooltip>
+            </OptionMenu>
             <Table className="table__main">
               <thead>
                 <tr>
-                  <th>
-                    <input
-                      type="checkbox"
-                      onChange={handleSelect}
-                      name="all"
-                      checked={
-                        selectedRows.length === notApprovedAttendance.length
-                      }
-                    />
-                  </th>
+                  <th></th>
                   <th>Date</th>
                   <th>Status</th>
                   <th>Approved By</th>
                   <th>Approved On</th>
-                  <th>Approve</th>
+                  <th>Action</th>
                 </tr>
               </thead>
               <tbody>
@@ -250,20 +327,18 @@ export default function AttendanceDialog({
                       ApprovedOn,
                       date,
                       isApproved,
+                      position,
                     },
                     index
                   ) => (
                     <React.Fragment key={index}>
                       <tr>
                         <td>
-                          <input
-                            type="checkbox"
+                          <Checkbox
                             name="single"
-                            disabled={
-                              status === null || isApproved === STATUS.PRESENT
-                            }
+                            disabled={status}
                             onChange={(event) =>
-                              handleSelect(event, {
+                              handleCheckboxSelection({
                                 id,
                                 markedOn,
                                 status,
@@ -271,9 +346,13 @@ export default function AttendanceDialog({
                                 ApprovedOn,
                                 date,
                                 isApproved,
+                                position,
                               })
                             }
-                            checked={selectedRows.includes(id)}
+                            checked={
+                              approvalRows.includes(position) ||
+                              regularizationRows.includes(position)
+                            }
                           />
                         </td>
                         <td>{moment(date).format(VIEW_DATE_FORMAT)}</td>
@@ -281,8 +360,10 @@ export default function AttendanceDialog({
                         <td>{approvedBy}</td>
                         <td>{ApprovedOn}</td>
                         <td>
-                          {isApproved === STATUS.NA && (
-                            <ApproveButton
+                          {status === null ? (
+                            <Button
+                              variant="contained"
+                              sx={{ width: "125px" }}
                               onClick={() =>
                                 handleApproval({
                                   id,
@@ -294,8 +375,29 @@ export default function AttendanceDialog({
                                 })
                               }
                             >
-                              Approve
-                            </ApproveButton>
+                              <AddIcon />
+                              Regularize
+                            </Button>
+                          ) : (
+                            !status && (
+                              <Button
+                                variant="contained"
+                                sx={{ width: "140px" }}
+                                onClick={() =>
+                                  handleRegularization({
+                                    id,
+                                    markedOn,
+                                    status,
+                                    approvedBy,
+                                    ApprovedOn,
+                                    date,
+                                  })
+                                }
+                              >
+                                <DoneAllIcon />
+                                Approve
+                              </Button>
+                            )
                           )}
                         </td>
                       </tr>
