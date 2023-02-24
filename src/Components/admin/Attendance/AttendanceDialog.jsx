@@ -5,20 +5,26 @@ import {
   Button,
   Checkbox,
   Dialog,
+  Divider,
   IconButton,
   Slide,
   Toolbar,
-  Tooltip,
+  // Tooltip,
   Typography,
 } from "@mui/material";
 import Styled from "styled-components";
 import { Table } from "../Constant";
 import moment from "moment";
-import { VIEW_DATE_FORMAT } from "../../../Utilities/Constant";
+import {
+  QUERY_DATE_FORMAT,
+  VIEW_DATE_FORMAT,
+  VIEW_TIME_FORMAT,
+} from "../../../Utilities/Constant";
 import CheckIcon from "@mui/icons-material/Check";
 import AddIcon from "@mui/icons-material/Add";
 import DoneAllIcon from "@mui/icons-material/DoneAll";
 import DownloadIcon from "@mui/icons-material/Download";
+import { useApproveAttendance } from "../../user/Hooks/useAttendance";
 
 const Transition = React.forwardRef(function Transition(props, ref) {
   return <Slide direction="left" ref={ref} {...props} />;
@@ -72,23 +78,33 @@ export default function AttendanceDialog({
   open = false,
   setOpen,
   momentDates,
-  attendance = [],
-  setCalendarData,
-  userDetail = {},
+  value,
+  setIndex,
+  index,
 }) {
+  const userDetail = useMemo(() => value[index] ?? {}, [index, value]);
+
+  const attendance = useMemo(
+    () => (value[index] ?? {})?.attendance ?? [],
+    [index, value]
+  );
+  console.log(attendance);
+  console.log(userDetail);
+  const { approveAttendance } = useApproveAttendance();
+
   const [approvalRows, setApprovalRows] = useState([]);
   const [regularizationRows, setRegularizationRows] = useState([]);
   const [approvalData, setApprovalData] = useState([]);
   const [regularizationData, setRegularizationData] = useState([]);
 
   const handleClose = useCallback(() => {
-    setCalendarData({});
+    setIndex(null);
     setOpen(false);
     setApprovalRows([]);
     setApprovalData([]);
     setRegularizationRows([]);
     setRegularizationData([]);
-  }, [setCalendarData, setOpen]);
+  }, [setIndex, setOpen]);
 
   const calendarGrid = useMemo(() => {
     const emptyObj = {
@@ -195,20 +211,47 @@ export default function AttendanceDialog({
     }
   }, [emptyDates, regularizationRows]);
 
-  const handleApproval = useCallback((value) => {
-    console.log(value);
-    // console.log(value);
-  }, []);
-  const handleRegularization = useCallback((value) => {
-    console.log(value);
-  }, []);
-  const handleBulkApprove = useCallback(() => {
-    console.log(approvalData);
-  }, [approvalData]);
+  const handleApproval = useCallback(
+    async (value) => {
+      const { id, tenantId } = userDetail;
+      const payload = {
+        user: { id, tenantId },
+        data: [value.id],
+      };
+      await approveAttendance(payload);
+    },
+    [approveAttendance, userDetail]
+  );
+  const handleRegularization = useCallback(
+    (value) => {
+      const { id, tenantId } = userDetail;
+      const payload = {
+        user: { id, tenantId },
+        data: [{ date: moment(value.date).format(QUERY_DATE_FORMAT) }],
+      };
+      console.log(payload);
+    },
+    [userDetail]
+  );
+  const handleBulkApprove = useCallback(async () => {
+    const { id, tenantId } = userDetail;
+    const payload = {
+      user: { id, tenantId },
+      data: approvalData.map((value) => value.id) ?? [],
+    };
+    await approveAttendance(payload);
+  }, [approvalData, userDetail, approveAttendance]);
 
   const handleBulkRegularize = useCallback(() => {
-    console.log(regularizationData);
-  }, [regularizationData]);
+    const { id, tenantId } = userDetail;
+    const payload = {
+      user: { id, tenantId },
+      data: regularizationData.map((value) => ({
+        date: moment(value.date).format(VIEW_DATE_FORMAT),
+      })),
+    };
+    console.log(payload);
+  }, [regularizationData, userDetail]);
 
   return (
     <div>
@@ -274,10 +317,6 @@ export default function AttendanceDialog({
                 <CheckIcon />
                 Select All (Approval)
               </Button>
-              <Button variant="contained" onClick={selectAllForRegularization}>
-                <CheckIcon />
-                Select All (Regularization)
-              </Button>
               <Button
                 variant="contained"
                 disabled={approvalRows.length < 2}
@@ -286,7 +325,11 @@ export default function AttendanceDialog({
                 Bulk Approve
                 {approvalRows.length > 0 && `(${approvalRows.length})`}
               </Button>
-              <br />
+              <Divider orientation="vertical" flexItem />
+              <Button variant="contained" onClick={selectAllForRegularization}>
+                <CheckIcon />
+                Select All (Regularization)
+              </Button>
               <Button
                 variant="contained"
                 disabled={regularizationRows.length < 2}
@@ -296,14 +339,16 @@ export default function AttendanceDialog({
                 {regularizationRows.length > 0 &&
                   `(${regularizationRows.length})`}
               </Button>
+              <Divider orientation="vertical" flexItem />
+              {/* 
               <Tooltip
                 title="Download Excel File under progress"
                 placement="top"
-              >
-                <Button variant="contained" disabled>
-                  <DownloadIcon />
-                </Button>
-              </Tooltip>
+              > */}
+              <Button variant="contained" disabled>
+                <DownloadIcon />
+              </Button>
+              {/* </Tooltip> */}
             </OptionMenu>
             <Table className="table__main">
               <thead>
@@ -358,14 +403,18 @@ export default function AttendanceDialog({
                         <td>{moment(date).format(VIEW_DATE_FORMAT)}</td>
                         <td>{isApproved}</td>
                         <td>{approvedBy}</td>
-                        <td>{ApprovedOn}</td>
+                        <td>
+                          {ApprovedOn
+                            ? moment(ApprovedOn).format(VIEW_TIME_FORMAT)
+                            : `-`}
+                        </td>
                         <td>
                           {status === null ? (
                             <Button
                               variant="contained"
-                              sx={{ width: "125px" }}
+                              sx={{ width: "140px" }}
                               onClick={() =>
-                                handleApproval({
+                                handleRegularization({
                                   id,
                                   markedOn,
                                   status,
@@ -384,7 +433,7 @@ export default function AttendanceDialog({
                                 variant="contained"
                                 sx={{ width: "140px" }}
                                 onClick={() =>
-                                  handleRegularization({
+                                  handleApproval({
                                     id,
                                     markedOn,
                                     status,

@@ -9,3 +9,6 @@ export const getTodaysAttendanceAPI = (payload) =>
 
 export const getUserAttendanceList = ({ month, year }) =>
   axios.get(`${ATTENDANCE_BASE_URL}/users?month=${month}&year=${year}`);
+
+export const approveAttendanceAPI = (payload) =>
+  axios.post(`${ATTENDANCE_BASE_URL}/approve`, payload);

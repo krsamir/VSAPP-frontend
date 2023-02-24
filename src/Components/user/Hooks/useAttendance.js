@@ -7,7 +7,7 @@ import {
   markAttendaceAPI,
   getTodaysAttendanceAPI,
 } from "../Services/Attendance.service";
-import { STATUS } from "../../../Utilities/Constant";
+import { STATUS, QUERY_DATE_FORMAT } from "../../../Utilities/Constant";
 import moment from "moment";
 
 export const useMarkAttendance = () => {
@@ -85,7 +85,7 @@ export const useCalendar = (
   year = moment().year()
 ) => {
   const selectedDate = `${year}-${month}-01`;
-  const date = moment(selectedDate);
+  const date = moment(selectedDate, QUERY_DATE_FORMAT);
   const currentMonth = date.clone().month() + 1;
   const currentYear = date.clone().year();
   const endOfThisMonth = date.clone().endOf(`month`).date();
@@ -98,4 +98,17 @@ export const useCalendar = (
     position: i,
   }));
   return useMemo(() => ({ momentDates }), [momentDates]);
+};
+
+export const useApproveAttendance = () => {
+  const { approveAttendanceThunk } = useStoreActions(
+    (store) => store.attendance
+  );
+  const { mutate: approveAttendance } = useMutation(approveAttendanceThunk, {
+    onError(e) {
+      console.log(e);
+      toast.error(`Issue while approving attendance.`);
+    },
+  });
+  return useMemo(() => ({ approveAttendance }), [approveAttendance]);
 };
