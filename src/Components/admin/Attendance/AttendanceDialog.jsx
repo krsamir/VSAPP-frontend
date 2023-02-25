@@ -17,6 +17,7 @@ import { Table } from "../Constant";
 import moment from "moment";
 import {
   QUERY_DATE_FORMAT,
+  STATUS as SERVER_STATUS,
   VIEW_DATE_FORMAT,
   VIEW_TIME_FORMAT,
 } from "../../../Utilities/Constant";
@@ -88,8 +89,7 @@ export default function AttendanceDialog({
     () => (value[index] ?? {})?.attendance ?? [],
     [index, value]
   );
-  console.log(attendance);
-  console.log(userDetail);
+
   const { approveAttendance } = useApproveAttendance();
 
   const [approvalRows, setApprovalRows] = useState([]);
@@ -218,9 +218,21 @@ export default function AttendanceDialog({
         user: { id, tenantId },
         data: [value.id],
       };
-      await approveAttendance(payload);
+      const position = value?.position;
+      await approveAttendance(payload, {
+        onSuccess(data) {
+          if (data?.data?.status === SERVER_STATUS.SUCCESS) {
+            if (approvalRows.includes(position)) {
+              setApprovalRows(approvalRows.filter((row) => row !== position));
+              setApprovalData(
+                approvalData.filter((value) => value.position !== position)
+              );
+            }
+          }
+        },
+      });
     },
-    [approveAttendance, userDetail]
+    [approvalData, approvalRows, approveAttendance, userDetail]
   );
   const handleRegularization = useCallback(
     (value) => {
@@ -239,8 +251,15 @@ export default function AttendanceDialog({
       user: { id, tenantId },
       data: approvalData.map((value) => value.id) ?? [],
     };
-    await approveAttendance(payload);
-  }, [approvalData, userDetail, approveAttendance]);
+    await approveAttendance(payload, {
+      onSuccess(data) {
+        if (data?.data?.status === SERVER_STATUS.SUCCESS) {
+          setApprovalRows([]);
+          setApprovalData([]);
+        }
+      },
+    });
+  }, [userDetail, approvalData, approveAttendance]);
 
   const handleBulkRegularize = useCallback(() => {
     const { id, tenantId } = userDetail;
@@ -315,7 +334,9 @@ export default function AttendanceDialog({
             <OptionMenu>
               <Button variant="contained" onClick={selectAllforApproval}>
                 <CheckIcon />
-                Select All (Approval)
+                {approvalRows.length > 0
+                  ? `Deselect All (Approval)`
+                  : `Select All (Approval)`}
               </Button>
               <Button
                 variant="contained"
@@ -440,6 +461,7 @@ export default function AttendanceDialog({
                                     approvedBy,
                                     ApprovedOn,
                                     date,
+                                    position,
                                   })
                                 }
                               >
